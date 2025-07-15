@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validateDuplicateUser(User user) {
-        userRepository.findByProviderID(user.getProviderId())
+        userRepository.findByProviderId(user.getProviderId())
                 .ifPresent(u -> {
                     throw new IllegalStateException(String.format("User with provider ID %s already exists", u.getProviderId()));
                 });

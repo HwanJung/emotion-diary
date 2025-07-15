@@ -1,16 +1,15 @@
 package hwan.diary.service;
 
 import hwan.diary.domain.Diary;
-import hwan.diary.repository.DiaryRepositoryCustom;
 import hwan.diary.repository.DiaryRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 public class DiaryService {
-    private DiaryRepositoryCustom diaryRepository;
+    private DiaryRepository diaryRepository;
 
-    public DiaryService(DiaryRepositoryCustom diaryRepository) {
+    public DiaryService(DiaryRepository diaryRepository) {
         this.diaryRepository = diaryRepository;
     }
 
@@ -18,7 +17,7 @@ public class DiaryService {
      * 일기작성
      */
     public long posting(Diary diary) {
-        //diaryRepository.save(diary);
+        diaryRepository.save(diary);
         return diary.getId();
     }
 
@@ -27,12 +26,10 @@ public class DiaryService {
      */
 
     public List<Diary> findDiary() {
-        //return diaryRepository.findAll();
-        return null;
+        return diaryRepository.findAll();
     }
 
     public Optional<Diary> findOne(long id) {
-        //return diaryRepository.findById(id);
-        return Optional.empty();
+        return diaryRepository.findById(id);
     }
 }

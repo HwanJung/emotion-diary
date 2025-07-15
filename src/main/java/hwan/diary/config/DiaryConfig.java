@@ -1,6 +1,6 @@
 package hwan.diary.config;
 
-import hwan.diary.repository.DiaryRepositoryCustom;
+import hwan.diary.repository.DiaryRepository;
 import hwan.diary.service.DiaryService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,14 +8,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DiaryConfig {
 
-    private final DiaryRepositoryCustom diaryRepository;
+    private final DiaryRepository diaryRepository;
 
-    public DiaryConfig(DiaryRepositoryCustom diaryRepository) {
+    public DiaryConfig(DiaryRepository diaryRepository) {
         this.diaryRepository = diaryRepository;
     }
 
     @Bean
-    public DiaryService diaryService(DiaryRepositoryCustom diaryRepository) {
+    public DiaryService diaryService(DiaryRepository diaryRepository) {
         return new DiaryService(diaryRepository);
     }
 }

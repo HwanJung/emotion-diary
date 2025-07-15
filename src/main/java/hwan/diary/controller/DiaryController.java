@@ -25,6 +25,9 @@ public class DiaryController {
     public String create(DiaryForm form) {
         Diary diary = new Diary();
         diary.setText(form.getText());
+
+        diaryService.posting(diary);
+
         return "diary/createDiaary";
     }
 
