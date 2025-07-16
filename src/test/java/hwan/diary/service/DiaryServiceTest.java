@@ -1,6 +1,7 @@
 package hwan.diary.service;
 
-import hwan.diary.domain.Diary;
+import hwan.diary.domain.diary.entity.Diary;
+import hwan.diary.domain.diary.service.DiaryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

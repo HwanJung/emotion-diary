@@ -1,4 +1,4 @@
-package hwan.diary.repository;
+package hwan.diary.domain.diary.repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

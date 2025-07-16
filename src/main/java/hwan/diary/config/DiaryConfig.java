@@ -1,7 +1,7 @@
 package hwan.diary.config;
 
-import hwan.diary.repository.DiaryRepository;
-import hwan.diary.service.DiaryService;
+import hwan.diary.domain.diary.repository.DiaryRepository;
+import hwan.diary.domain.diary.service.DiaryService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

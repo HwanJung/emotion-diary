@@ -1,4 +1,4 @@
-package hwan.diary.domain;
+package hwan.diary.domain.diary.entity;
 
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;

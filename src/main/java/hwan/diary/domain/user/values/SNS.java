@@ -1,4 +1,4 @@
-package hwan.diary.domain;
+package hwan.diary.domain.user.values;
 
 public enum SNS {
     KAKAO,

@@ -1,4 +1,4 @@
-package hwan.diary.controller;
+package hwan.diary.domain.diary.controller;
 
 public class DiaryForm {
     public long uid;

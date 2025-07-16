@@ -1,9 +1,9 @@
 package hwan.diary.repository;
 
-import hwan.diary.domain.SNS;
-import hwan.diary.domain.User;
+import hwan.diary.domain.user.values.SNS;
+import hwan.diary.domain.user.entity.User;
+import hwan.diary.domain.user.repository.H2UserRepository;
 import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 public class H2UserRepositoryTest {
@@ -34,10 +34,13 @@ public class H2UserRepositoryTest {
         userRepository.save(user);
 
         Optional<User> result = userRepository.findById(user.getId());
+        assertTrue(result.isPresent());
+
+        String expectedName = "hwan";
+        String actualName   = result.get().getUsername();
 
         // then
-        assertThat(result).isPresent();
-        assertThat(result.get().getUsername()).isEqualTo("hwan");
+        assertEquals(expectedName, actualName);
     }
 
     private User createTestUser() {

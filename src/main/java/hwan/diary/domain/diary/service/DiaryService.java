@@ -1,7 +1,7 @@
-package hwan.diary.service;
+package hwan.diary.domain.diary.service;
 
-import hwan.diary.domain.Diary;
-import hwan.diary.repository.DiaryRepository;
+import hwan.diary.domain.diary.entity.Diary;
+import hwan.diary.domain.diary.repository.DiaryRepository;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,7 +1,7 @@
-package hwan.diary.controller;
+package hwan.diary.domain.diary.controller;
 
-import hwan.diary.domain.Diary;
-import hwan.diary.service.DiaryService;
+import hwan.diary.domain.diary.entity.Diary;
+import hwan.diary.domain.diary.service.DiaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

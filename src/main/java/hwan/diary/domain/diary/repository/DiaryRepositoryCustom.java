@@ -1,9 +1,4 @@
-package hwan.diary.repository;
-
-import hwan.diary.domain.Diary;
-
-import java.util.List;
-import java.util.Optional;
+package hwan.diary.domain.diary.repository;
 
 public interface DiaryRepositoryCustom {
     //Diary save(Diary diary);

@@ -1,7 +1,7 @@
-package hwan.diary.service;
+package hwan.diary.domain.user.service;
 
-import hwan.diary.domain.User;
-import hwan.diary.repository.UserRepository;
+import hwan.diary.domain.user.entity.User;
+import hwan.diary.domain.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

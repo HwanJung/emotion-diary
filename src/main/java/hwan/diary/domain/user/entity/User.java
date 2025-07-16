@@ -1,5 +1,6 @@
-package hwan.diary.domain;
+package hwan.diary.domain.user.entity;
 
+import hwan.diary.domain.user.values.SNS;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

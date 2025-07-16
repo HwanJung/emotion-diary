@@ -1,6 +1,6 @@
-package hwan.diary.repository;
+package hwan.diary.domain.user.repository;
 
-import hwan.diary.domain.User;
+import hwan.diary.domain.user.entity.User;
 
 import java.util.Optional;
 

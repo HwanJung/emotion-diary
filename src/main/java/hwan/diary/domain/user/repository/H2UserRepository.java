@@ -1,6 +1,6 @@
-package hwan.diary.repository;
+package hwan.diary.domain.user.repository;
 
-import hwan.diary.domain.User;
+import hwan.diary.domain.user.entity.User;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
