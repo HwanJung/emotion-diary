@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class DiaryService {
-    private DiaryRepository diaryRepository;
+    private final DiaryRepository diaryRepository;
 
     public DiaryService(DiaryRepository diaryRepository) {
         this.diaryRepository = diaryRepository;
