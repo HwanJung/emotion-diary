@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class DiaryForm {
     public long uid;
     public String title;
-    public String text;
+    public String content;
     public MultipartFile image;
 
 }

@@ -29,13 +29,11 @@ public class DiaryController {
 
     @PostMapping("/post")
     public String create(@ModelAttribute DiaryForm form) {
-        Diary diary = new Diary();
-        diary.setText(form.getText());
-        //form으로 image받고 url로 변환해 service entity 대입
-        diaryService.posting(diary);
-
-        return "createDiary";
+        diaryService.posting(form);
+        return "redirect:/diary";
     }
+
+
 
     @GetMapping("/mydiary")
     public String myDiary() {

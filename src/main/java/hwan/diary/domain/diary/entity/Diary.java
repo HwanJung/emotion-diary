@@ -18,7 +18,7 @@ public class Diary {
     private long uid;
     private String title;
     @Lob
-    private String text;
+    private String content;
     private String image_url;
 
     @CreatedDate
