@@ -1,15 +1,16 @@
 package hwan.diary.domain.user.entity;
 
-import hwan.diary.domain.user.values.SNS;
+import hwan.diary.domain.user.values.Provider;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -20,11 +21,12 @@ public class User {
     private String username;
 
     @Enumerated(EnumType.STRING)
-    private SNS provider;
+    private Provider provider;
 
     private String providerId;
 
     private String profileImageUrl;
 
     private String email;
+
 }
