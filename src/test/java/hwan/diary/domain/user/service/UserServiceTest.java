@@ -1,7 +1,7 @@
 package hwan.diary.domain.user.service;
 
-import hwan.diary.common.exception.UserNotFoundException;
-import hwan.diary.api.auth.dto.request.OAuthUserRequest;
+import hwan.diary.common.exception.user.UserNotFoundException;
+import hwan.diary.domain.auth.dto.request.OAuthUserRequest;
 import hwan.diary.domain.user.dto.request.UpdateProfileRequest;
 import hwan.diary.domain.user.dto.response.UserResponse;
 import hwan.diary.domain.user.entity.User;

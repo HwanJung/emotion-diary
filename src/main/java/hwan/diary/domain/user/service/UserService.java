@@ -1,7 +1,8 @@
 package hwan.diary.domain.user.service;
 
-import hwan.diary.common.exception.UserNotFoundException;
-import hwan.diary.api.auth.dto.request.OAuthUserRequest;
+import hwan.diary.common.exception.user.UserNotFoundException;
+import hwan.diary.domain.auth.dto.request.OAuthUserRequest;
+import hwan.diary.common.exception.values.ErrorCode;
 import hwan.diary.domain.user.dto.request.UpdateProfileRequest;
 import hwan.diary.domain.user.dto.response.UserResponse;
 import hwan.diary.domain.user.entity.User;
@@ -22,9 +23,9 @@ public class UserService {
      * Find existing user by providerId, or register if not found.
      *
      * @param request OAuth login request containing provider info and user details
-     * @return the found or registered user as UserResponse
+     * @return the found or registered user id
      */
-    public UserResponse findOrRegister(OAuthUserRequest request) {
+    public Long findOrRegister(OAuthUserRequest request) {
 
         User user = userRepository.findByProviderId(request.providerId())
             .orElseGet(() -> userRepository.save(
@@ -36,7 +37,7 @@ public class UserService {
                     .build()
             ));
 
-        return UserMapper.toResponse(user);
+        return user.getId();
     }
 
     /**
@@ -59,7 +60,7 @@ public class UserService {
         User user = this.findUserByIdInternal(id);
 
         if(user == null) {
-            throw new UserNotFoundException(id.toString());
+            throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
         }
 
         return UserMapper.toResponse(user);
@@ -77,7 +78,7 @@ public class UserService {
         User user = this.findUserByIdInternal(id);
 
         if(user == null) {
-            throw new UserNotFoundException(id.toString());
+            throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
         }
 
         user.setUsername(request.username());
@@ -86,9 +87,11 @@ public class UserService {
         return UserMapper.toResponse(user);
     }
 
+    public
+
     /**
      * Internal private method.
-     * Find a user by id. if not exist, throw UserNotFoundException
+     * Find a user by id. if not exist, return null.
      *
      * @param id the id of the user to update
      * @return the found user entity

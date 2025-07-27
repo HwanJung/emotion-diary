@@ -1,4 +1,4 @@
-package hwan.diary.api.auth.dto.request;
+package hwan.diary.domain.auth.dto.request;
 
 import hwan.diary.domain.user.values.Provider;
 

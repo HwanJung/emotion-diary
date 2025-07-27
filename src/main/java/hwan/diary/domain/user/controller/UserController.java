@@ -3,7 +3,7 @@ package hwan.diary.domain.user.controller;
 import hwan.diary.domain.user.dto.request.UpdateProfileRequest;
 import hwan.diary.domain.user.dto.response.UserResponse;
 import hwan.diary.domain.user.service.UserService;
-import hwan.diary.security.jwt.JwtUserPrincipal;
+import hwan.diary.security.jwt.principal.JwtUserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

@@ -1,7 +1,11 @@
-package hwan.diary.security.jwt;
+package hwan.diary.security.jwt.principal;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
+/**
+ * JwtAuthenticationToken contains authentication info, principal
+ *
+ */
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
     private final JwtUserPrincipal principal;

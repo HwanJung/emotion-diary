@@ -1,0 +1,90 @@
+package hwan.diary.domain.auth.token;
+
+import hwan.diary.common.exception.token.TokenExpiredException;
+import hwan.diary.common.exception.token.TokenInvalidException;
+import hwan.diary.common.exception.token.TokenMissingException;
+import hwan.diary.common.exception.token.TokenException;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import java.util.Date;
+
+@Component
+public class JwtProvider {
+
+    private static final long ACCESS_TOKEN_EXPIRATION_MS = 1000L * 60 * 60;
+    private static final long REFRESH_TOKEN_EXPIRATION_MS = 1000L * 60 * 60 * 24 * 7;
+
+    private final SecretKey secretKey;
+
+    public JwtProvider(@Value("${jwt.secret}") String secret) {
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+    }
+
+    /**
+     * Generate a JWT token containing the user id as the subject.
+     *
+     * @param userId the user id to include in the token
+     * @param type the type of token (ACCESS or REFRESH)
+     * @return generated JWT token as String
+     */
+    public String generateToken(Long userId, TokenType type) {
+        String claimValue = type == TokenType.ACCESS ? "access" : "refresh";
+        long expirationMs = type == TokenType.ACCESS ? ACCESS_TOKEN_EXPIRATION_MS : REFRESH_TOKEN_EXPIRATION_MS;
+
+        return Jwts.builder()
+            .subject(userId.toString())
+            .claim("type", claimValue)
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + expirationMs))
+            .signWith(secretKey)
+            .compact();
+    }
+
+    /**
+     * Validate the given JWT token.
+     *
+     * @param token the JWT token from the client's request
+     * @param type the type of token (ACCESS or REFRESH)
+     * @return true if the token is valid or throw exception
+     * @throws TokenException with the token type to setting error code, when the token is missing or expired or invalid
+     */
+    public boolean validateToken(String token, TokenType type) {
+        if (token == null || token.trim().isEmpty()) {
+            throw new TokenMissingException(type);
+        }
+
+        try {
+            Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+            throw new TokenExpiredException(type);
+        } catch (JwtException e) {
+            throw new TokenInvalidException(type);
+        }
+    }
+
+    /**
+     * Extract user id from a valid JWT token.
+     *
+     * @param token the JWT token from the client's Authorization header
+     * @return extracted user id from token
+     */
+    public Long extractUserId(String token) {
+        Claims claims = Jwts.parser()
+            .verifyWith(secretKey)
+            .build()
+            .parseSignedClaims(token)
+            .getPayload();
+        return Long.parseLong(claims.getSubject());
+    }
+}
