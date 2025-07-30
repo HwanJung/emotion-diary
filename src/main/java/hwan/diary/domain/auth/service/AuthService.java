@@ -9,6 +9,7 @@ import hwan.diary.domain.user.service.UserService;
 import hwan.diary.security.jwt.service.RefreshTokenService;
 import hwan.diary.security.jwt.token.JwtProvider;
 import hwan.diary.security.jwt.token.TokenType;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,20 +63,18 @@ public class AuthService {
 
         String refreshToken = request.getHeader("Refresh-Token");
 
-        jwtProvider.validateToken(refreshToken, TokenType.REFRESH);
+        Claims claims = jwtProvider.parseClaims(refreshToken, TokenType.REFRESH);
 
-        Long uid = jwtProvider.extractUserId(refreshToken);
+        Long uid = jwtProvider.getUserIdFromClaims(claims, TokenType.REFRESH);
 
         String savedRefreshToken = refreshTokenService.get(uid);
 
         if(savedRefreshToken == null) {
-            log.warn("Refresh token not found in server. uid={}", uid);
-            throw new RefreshTokenNotFoundException();
+            throw new RefreshTokenNotFoundException(uid);
         }
 
         if(!refreshToken.equals(savedRefreshToken)) {
-            log.warn("Provided refresh token does not match stored token. uid={}", uid);
-            throw new RefreshTokenMismatchException();
+            throw new RefreshTokenMismatchException(uid);
         }
 
         String accessToken = jwtProvider.generateToken(uid, TokenType.ACCESS);

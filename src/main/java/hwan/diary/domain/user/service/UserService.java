@@ -60,7 +60,7 @@ public class UserService {
         User user = this.findUserByIdInternal(id);
 
         if(user == null) {
-            throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
+            throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND, id);
         }
 
         return UserMapper.toResponse(user);
@@ -78,7 +78,7 @@ public class UserService {
         User user = this.findUserByIdInternal(id);
 
         if(user == null) {
-            throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
+            throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND, id);
         }
 
         user.setUsername(request.username());

@@ -3,8 +3,10 @@ package hwan.diary.security.jwt.entrypoint;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hwan.diary.common.exception.token.TokenException;
 import hwan.diary.common.exception.ErrorCode;
+import hwan.diary.common.exception.token.TokenExpiredException;
+import hwan.diary.common.exception.token.TokenInvalidException;
+import hwan.diary.common.exception.token.TokenMissingException;
 import hwan.diary.common.response.ErrorResponse;
-import hwan.diary.security.jwt.token.TokenType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,8 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
@@ -37,15 +41,17 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         if(exception instanceof TokenException tokenException) {
             ErrorCode errorCode = tokenException.getErrorCode();
             errorResponse = new ErrorResponse(errorCode);
-        } else {
 
+            tokenException.log(log);
+        } else {
             errorResponse = new ErrorResponse(ErrorCode.UNAUTHORIZED);
+
+            log.warn("Unauthorized access token");
         }
 
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        ObjectMapper objectMapper = new ObjectMapper();
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
 }

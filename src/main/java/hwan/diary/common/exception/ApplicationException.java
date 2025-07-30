@@ -1,9 +1,10 @@
 package hwan.diary.common.exception;
 
 import lombok.Getter;
+import org.slf4j.Logger;
 
 @Getter
-public class ApplicationException extends RuntimeException {
+public abstract class ApplicationException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
@@ -11,4 +12,6 @@ public class ApplicationException extends RuntimeException {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
+
+    public abstract void log(Logger log);
 }

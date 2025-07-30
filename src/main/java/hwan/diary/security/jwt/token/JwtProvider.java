@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.time.Instant;
 import java.util.Date;
 
 @Slf4j
@@ -33,7 +34,7 @@ public class JwtProvider {
      * Generate a JWT token containing the user id as the subject.
      *
      * @param userId the user id to include in the token
-     * @param type the type of token (ACCESS or REFRESH)
+     * @param type   the type of token (ACCESS or REFRESH)
      * @return generated JWT token as String
      */
     public String generateToken(Long userId, TokenType type) {
@@ -50,44 +51,49 @@ public class JwtProvider {
     }
 
     /**
-     * Validate the given JWT token.
+     * Validate the token and parse claims from the token.
+     * Throws an exception, when the token is misses or expired or invalid.
      *
      * @param token the JWT token from the client's request
-     * @param type the type of token (ACCESS or REFRESH)
-     * @return true if the token is valid or throw exception
-     * @throws TokenException with the token type to setting error code, when the token is missing or expired or invalid
+     * @param type  the token type(ACCESS or REFRESH)
+     * @return Claims extracted from the token
      */
-    public boolean validateToken(String token, TokenType type) {
+    public Claims parseClaims(String token, TokenType type) {
         if (token == null || token.trim().isEmpty()) {
             throw new TokenMissingException(type);
         }
 
         try {
-            Jwts.parser()
+            return Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
-                .parseSignedClaims(token);
-            return true;
+                .parseSignedClaims(token)
+                .getPayload();
         } catch (ExpiredJwtException e) {
+            Claims claims = e.getClaims();
+            Instant expirationTime = claims.getExpiration().toInstant();
+            Long uid = getUserIdFromClaims(claims, type);
 
-            throw new TokenExpiredException(type);
+            throw new TokenExpiredException(type, uid, expirationTime);
         } catch (JwtException e) {
             throw new TokenInvalidException(type);
         }
     }
 
     /**
-     * Extract user id from a valid JWT token.
+     * Extract user id from the claims.
+     * Throws an exception, when subject is not Long type.
      *
-     * @param token the JWT token from the client's Authorization header
-     * @return extracted user id from token
+     * @param claims extracted from a valid token.
+     * @param type   the token type(ACCESS or REFRESH)
+     * @return user id as Long
      */
-    public Long extractUserId(String token) {
-        Claims claims = Jwts.parser()
-            .verifyWith(secretKey)
-            .build()
-            .parseSignedClaims(token)
-            .getPayload();
-        return Long.parseLong(claims.getSubject());
+    public Long getUserIdFromClaims(Claims claims, TokenType type) {
+        try {
+            return Long.parseLong(claims.getSubject());
+        } catch (NumberFormatException e) {
+            throw new TokenInvalidException(type);
+        }
     }
 }
+

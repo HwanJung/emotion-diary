@@ -4,6 +4,7 @@ import hwan.diary.common.exception.ApplicationException;
 import hwan.diary.common.exception.ErrorCode;
 import hwan.diary.security.jwt.token.TokenType;
 import lombok.Getter;
+import org.slf4j.Logger;
 
 @Getter
 public abstract class TokenException extends ApplicationException {
@@ -13,5 +14,7 @@ public abstract class TokenException extends ApplicationException {
         super(errorCode);
         this.tokenType = tokenType;
     }
+
+    public abstract void log(Logger log);
 
 }

@@ -5,6 +5,7 @@ import hwan.diary.security.jwt.principal.JwtAuthenticationToken;
 import hwan.diary.security.jwt.token.JwtProvider;
 import hwan.diary.security.jwt.principal.JwtUserPrincipal;
 import hwan.diary.security.jwt.token.TokenType;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +24,7 @@ import java.io.IOException;
  * JWT authentication filter.
  * Resolve the JWT token from client request and validate the token.
  * Register authentication info to SecurityContext.
- *
+ * <p>
  * Throws an exception, when JWT token is expired or invalid.
  */
 @Component
@@ -36,20 +37,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
 
         try {
             String token = resolveToken(request);
 
-            if (jwtProvider.validateToken(token, TokenType.ACCESS)) {
-                Long userId = jwtProvider.extractUserId(token);
+            Claims claims = jwtProvider.parseClaims(token, TokenType.ACCESS);
+            Long userId = jwtProvider.getUserIdFromClaims(claims, TokenType.ACCESS);
 
-                JwtUserPrincipal principal = new JwtUserPrincipal(userId);
+            JwtUserPrincipal principal = new JwtUserPrincipal(userId);
+            Authentication authentication = new JwtAuthenticationToken(principal);
 
-                Authentication authentication = new JwtAuthenticationToken(principal);
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);
         } catch (TokenException e) {
