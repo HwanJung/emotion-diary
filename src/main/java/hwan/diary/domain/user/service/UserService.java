@@ -2,7 +2,7 @@ package hwan.diary.domain.user.service;
 
 import hwan.diary.common.exception.user.UserNotFoundException;
 import hwan.diary.domain.auth.dto.request.OAuthUserRequest;
-import hwan.diary.common.exception.values.ErrorCode;
+import hwan.diary.common.exception.ErrorCode;
 import hwan.diary.domain.user.dto.request.UpdateProfileRequest;
 import hwan.diary.domain.user.dto.response.UserResponse;
 import hwan.diary.domain.user.entity.User;
@@ -86,8 +86,6 @@ public class UserService {
 
         return UserMapper.toResponse(user);
     }
-
-    public
 
     /**
      * Internal private method.

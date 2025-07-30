@@ -1,9 +1,11 @@
 package hwan.diary.common.exception.token;
 
 import hwan.diary.common.exception.ApplicationException;
-import hwan.diary.common.exception.values.ErrorCode;
+import hwan.diary.common.exception.ErrorCode;
+import lombok.Getter;
 
 public class RefreshTokenNotFoundException extends ApplicationException {
+
     public RefreshTokenNotFoundException() {
         super(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
     }

@@ -6,12 +6,15 @@ import hwan.diary.domain.auth.dto.response.TokenResponse;
 import hwan.diary.common.exception.token.RefreshTokenMismatchException;
 import hwan.diary.common.exception.token.RefreshTokenNotFoundException;
 import hwan.diary.domain.user.service.UserService;
-import hwan.diary.domain.auth.token.JwtProvider;
-import hwan.diary.domain.auth.token.TokenType;
+import hwan.diary.security.jwt.service.RefreshTokenService;
+import hwan.diary.security.jwt.token.JwtProvider;
+import hwan.diary.security.jwt.token.TokenType;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -66,10 +69,12 @@ public class AuthService {
         String savedRefreshToken = refreshTokenService.get(uid);
 
         if(savedRefreshToken == null) {
+            log.warn("Refresh token not found in server. uid={}", uid);
             throw new RefreshTokenNotFoundException();
         }
 
         if(!refreshToken.equals(savedRefreshToken)) {
+            log.warn("Provided refresh token does not match stored token. uid={}", uid);
             throw new RefreshTokenMismatchException();
         }
 

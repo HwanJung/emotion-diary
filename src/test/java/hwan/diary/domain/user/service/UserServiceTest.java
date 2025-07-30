@@ -9,6 +9,7 @@ import hwan.diary.domain.user.repository.UserRepository;
 import hwan.diary.domain.user.values.Provider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -53,15 +54,10 @@ public class UserServiceTest {
         );
 
         // when
-        UserResponse result = userService.findOrRegister(request);
+        Long uid = userService.findOrRegister(request);
 
         // then
-        assertNotNull(result);
-        assertEquals(providerId, result.providerId());
-        assertEquals("GOOGLE", result.provider());
-        assertEquals("user@google.com", result.email());
-        assertEquals("user", result.username());
-
+        assertEquals(existingUser.getId(), uid);
         verify(userRepository, never()).save(any(User.class));
     }
 
@@ -70,9 +66,6 @@ public class UserServiceTest {
         //given
         String providerId = "google-1234";
 
-        given(userRepository.findByProviderId(providerId)).willReturn(Optional.empty());
-        given(userRepository.save(any(User.class))).willAnswer(invocation -> invocation.getArgument(0));
-
         OAuthUserRequest request = new OAuthUserRequest(
             "user",
             Provider.GOOGLE,
@@ -80,18 +73,37 @@ public class UserServiceTest {
             "user@google.com"
         );
 
+        given(userRepository.findByProviderId(providerId)).willReturn(Optional.empty());
+        given(userRepository.save(any(User.class))).willAnswer(
+            invocation -> {
+                User user = invocation.getArgument(0);
+                return User.builder()
+                    .id(1L)
+                    .username(user.getUsername())
+                    .provider(user.getProvider())
+                    .providerId(user.getProviderId())
+                    .email(user.getEmail())
+                    .build();
+            }
+        );
+
         // when
-        UserResponse result = userService.findOrRegister(request);
+        Long uid = userService.findOrRegister(request);
 
         // then
-        assertNotNull(result);
-        assertEquals(providerId, result.providerId());
-        assertEquals("GOOGLE", result.provider());
-        assertEquals("user@google.com", result.email());
-        assertEquals("user", result.username());
-
         verify(userRepository).findByProviderId(providerId);
-        verify(userRepository).save(any(User.class));
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(captor.capture());
+
+        User savedUser = captor.getValue();
+
+        assertEquals("user", savedUser.getUsername());
+        assertEquals(Provider.GOOGLE, savedUser.getProvider());
+        assertEquals("google-1234", savedUser.getProviderId());
+        assertEquals("user@google.com", savedUser.getEmail());
+
+        assertNotNull(uid);
     }
 
     @Test

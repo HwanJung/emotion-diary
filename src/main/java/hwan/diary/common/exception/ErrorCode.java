@@ -1,4 +1,4 @@
-package hwan.diary.common.exception.values;
+package hwan.diary.common.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -20,6 +20,9 @@ public enum ErrorCode {
     ACCESS_TOKEN_MISSING("ACCESS_TOKEN_MISSING", "Access token is missing", HttpStatus.UNAUTHORIZED),
     REFRESH_TOKEN_MISSING("REFRESH_TOKEN_MISSING", "Refresh token is missing", HttpStatus.UNAUTHORIZED),
 
+    // Default UNAUTHORIZED code
+    UNAUTHORIZED("UNAUTHORIZED", "Authorized required", HttpStatus.UNAUTHORIZED),
+
     // When handle RefreshTokenMismatch Exception
     REFRESH_TOKEN_MISMATCH("REFRESH_TOKEN_MISMATCH", "Refresh token mismatch", HttpStatus.UNAUTHORIZED),
 
@@ -28,8 +31,6 @@ public enum ErrorCode {
 
     // When handle UserNotFoundException
     USER_NOT_FOUND("USER_NOT_FOUND", "Requested user is not exist", HttpStatus.NOT_FOUND);
-
-
 
     private final String code;
     private final String message;

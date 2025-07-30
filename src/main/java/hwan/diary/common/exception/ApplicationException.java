@@ -1,6 +1,5 @@
 package hwan.diary.common.exception;
 
-import hwan.diary.common.exception.values.ErrorCode;
 import lombok.Getter;
 
 @Getter

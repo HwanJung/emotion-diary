@@ -1,4 +1,4 @@
-package hwan.diary.domain.auth.token;
+package hwan.diary.security.jwt.token;
 
 import hwan.diary.common.exception.token.TokenExpiredException;
 import hwan.diary.common.exception.token.TokenInvalidException;
@@ -9,12 +9,14 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtProvider {
 
@@ -67,6 +69,7 @@ public class JwtProvider {
                 .parseSignedClaims(token);
             return true;
         } catch (ExpiredJwtException e) {
+
             throw new TokenExpiredException(type);
         } catch (JwtException e) {
             throw new TokenInvalidException(type);

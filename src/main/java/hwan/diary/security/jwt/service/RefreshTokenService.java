@@ -1,4 +1,4 @@
-package hwan.diary.domain.auth.service;
+package hwan.diary.security.jwt.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;

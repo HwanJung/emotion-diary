@@ -1,4 +1,4 @@
-package hwan.diary.domain.auth.token;
+package hwan.diary.security.jwt.token;
 
 import lombok.Getter;
 

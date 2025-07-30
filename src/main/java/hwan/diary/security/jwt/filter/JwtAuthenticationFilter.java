@@ -2,9 +2,9 @@ package hwan.diary.security.jwt.filter;
 
 import hwan.diary.common.exception.token.TokenException;
 import hwan.diary.security.jwt.principal.JwtAuthenticationToken;
-import hwan.diary.domain.auth.token.JwtProvider;
+import hwan.diary.security.jwt.token.JwtProvider;
 import hwan.diary.security.jwt.principal.JwtUserPrincipal;
-import hwan.diary.domain.auth.token.TokenType;
+import hwan.diary.security.jwt.token.TokenType;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,6 +1,6 @@
 package hwan.diary.common.response;
 
-import hwan.diary.common.exception.values.ErrorCode;
+import hwan.diary.common.exception.ErrorCode;
 
 public record ErrorResponse(
     String code,

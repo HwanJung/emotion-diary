@@ -1,10 +1,6 @@
 package hwan.diary.common.exception;
 
-import hwan.diary.common.exception.token.TokenException;
-import hwan.diary.common.exception.user.UserNotFoundException;
-import hwan.diary.common.exception.values.ErrorCode;
 import hwan.diary.common.response.ErrorResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
