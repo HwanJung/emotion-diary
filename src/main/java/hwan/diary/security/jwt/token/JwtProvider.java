@@ -21,13 +21,17 @@ import java.util.Date;
 @Component
 public class JwtProvider {
 
-    private static final long ACCESS_TOKEN_EXPIRATION_MS = 1000L * 60 * 60;
-    private static final long REFRESH_TOKEN_EXPIRATION_MS = 1000L * 60 * 60 * 24 * 7;
-
+    private final long accessTokenExpirationMs;
+    private final long refreshTokenExpirationMs;
     private final SecretKey secretKey;
 
-    public JwtProvider(@Value("${jwt.secret}") String secret) {
+    public JwtProvider(@Value("${jwt.secret}") String secret,
+                       @Value("${jwt.access-token-expiration-ms}") long accessTokenExpirationMs,
+                       @Value("${jwt.refresh-token-expiration-ms}") long refreshTokenExpirationMs
+    ) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+        this.accessTokenExpirationMs = accessTokenExpirationMs;
+        this.refreshTokenExpirationMs = refreshTokenExpirationMs;
     }
 
     /**
@@ -39,7 +43,7 @@ public class JwtProvider {
      */
     public String generateToken(Long userId, TokenType type) {
         String claimValue = type == TokenType.ACCESS ? "access" : "refresh";
-        long expirationMs = type == TokenType.ACCESS ? ACCESS_TOKEN_EXPIRATION_MS : REFRESH_TOKEN_EXPIRATION_MS;
+        long expirationMs = type == TokenType.ACCESS ? accessTokenExpirationMs : refreshTokenExpirationMs;
 
         return Jwts.builder()
             .subject(userId.toString())

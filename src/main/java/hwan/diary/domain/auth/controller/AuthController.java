@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -37,12 +39,13 @@ public class AuthController {
      * Authentication is needed.
      * logout logic
      *
-     * @param userPrincipal the authenticated user info
-     * @return
+     * @param principal the authenticated user info
+     * @return no content response
      */
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@AuthenticationPrincipal JwtUserPrincipal userPrincipal) {
-        authService.logout(userPrincipal.id());
+    public ResponseEntity<Void> logout(Principal principal) {
+        Long userId = Long.parseLong(principal.getName());
+        authService.logout(userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -53,8 +56,20 @@ public class AuthController {
      * @return a generated access token
      */
     @PostMapping("/reissue")
-    public ResponseEntity<AccessTokenResponse> reissue(@RequestBody HttpServletRequest request) {
+    public ResponseEntity<AccessTokenResponse> reissue(HttpServletRequest request) {
         AccessTokenResponse accessTokenResponse = authService.reissueAccessToken(request);
         return ResponseEntity.ok(accessTokenResponse);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+

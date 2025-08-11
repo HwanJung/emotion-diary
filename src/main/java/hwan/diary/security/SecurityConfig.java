@@ -2,6 +2,7 @@ package hwan.diary.security;
 
 import hwan.diary.security.jwt.entrypoint.JwtAuthenticationEntryPoint;
 import hwan.diary.security.jwt.filter.JwtAuthenticationFilter;
+import hwan.diary.security.jwt.token.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,5 +33,10 @@ public class SecurityConfig {
             .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint));
 
         return http.build();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtProvider jwtProvider) {
+        return new JwtAuthenticationFilter(jwtProvider);
     }
 }

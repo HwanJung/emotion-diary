@@ -5,7 +5,6 @@ import hwan.diary.domain.user.controller.UserController;
 import hwan.diary.domain.user.dto.request.UpdateProfileRequest;
 import hwan.diary.domain.user.dto.response.UserResponse;
 import hwan.diary.domain.user.service.UserService;
-import hwan.diary.security.jwt.filter.JwtAuthenticationFilter;
 import hwan.diary.security.jwt.principal.JwtAuthenticationToken;
 import hwan.diary.security.jwt.principal.JwtUserPrincipal;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.AuditorAware;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -44,14 +42,6 @@ public class UserControllerTest {
         public UserService userService() {
             return mock(UserService.class);
         }
-        @Bean
-        public JwtAuthenticationFilter jwtAuthenticationFilter() {
-            return mock(JwtAuthenticationFilter.class);
-        }
-        @Bean
-        public AuditorAware<?> auditorAware() {
-            return mock(AuditorAware.class);
-        }
     }
 
     static ObjectMapper objectMapper = new ObjectMapper();
@@ -65,7 +55,6 @@ public class UserControllerTest {
             "profile.jpg",
             "user@google.com"
         );
-
     }
 
     @Test
@@ -76,13 +65,13 @@ public class UserControllerTest {
 
         // when & then
         mockMvc.perform(get("/api/users/me")
-                .principal(new JwtAuthenticationToken(new JwtUserPrincipal(1L))))
+                .principal(() -> "1"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(1L))
             .andExpect(jsonPath("$.username").value("user"))
             .andExpect(jsonPath("$.provider").value("GOOGLE"))
             .andExpect(jsonPath("$.providerId").value("google-1234"))
-            .andExpect(jsonPath("$.providerImageUrl").value("profile.jpg"))
+            .andExpect(jsonPath("$.profileImageUrl").value("profile.jpg"))
             .andExpect(jsonPath("$.email").value("user@google.com"));
 
     }
@@ -127,7 +116,7 @@ public class UserControllerTest {
             .andExpect(jsonPath("$.username").value("updated_username"))
             .andExpect(jsonPath("$.provider").value("GOOGLE"))
             .andExpect(jsonPath("$.providerId").value("google-1234"))
-            .andExpect(jsonPath("$.providerImageUrl").value("updated_profile.jpg"))
+            .andExpect(jsonPath("$.profileImageUrl").value("updated_profile.jpg"))
             .andExpect(jsonPath("$.email").value("user@google.com"));
     }
 

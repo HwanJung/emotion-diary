@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -18,14 +20,15 @@ public class UserController {
 
     /**
      * Return the user info.
-     * The user must be authenticated by JWT token
+     * The user must be authenticated by JWT access token
      *
-     * @param jwtUserPrincipal the authenticated user by JWT token
+     * @param principal the authenticated user by JWT token
      * @return a user info as UserResponse.
      */
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getMyAccount(@AuthenticationPrincipal JwtUserPrincipal jwtUserPrincipal) {
-        UserResponse userResponse = userService.findUserById(jwtUserPrincipal.id());
+    public ResponseEntity<UserResponse> getMyAccount(Principal principal) {
+        Long userId = Long.parseLong(principal.getName());
+        UserResponse userResponse = userService.findUserById(userId);
         return ResponseEntity.ok(userResponse);
     }
 
@@ -33,12 +36,13 @@ public class UserController {
      * Delete the user.
      * The user must be authenticated by JWT token
      *
-     * @param jwtUserPrincipal the authenticated user by JWT token
+     * @param principal the authenticated user by JWT token
      * @return HTTP 204 No content response
      */
     @DeleteMapping("/me")
-    public ResponseEntity<Void> deleteMyAccount(@AuthenticationPrincipal JwtUserPrincipal jwtUserPrincipal) {
-        userService.deleteUser(jwtUserPrincipal.id());
+    public ResponseEntity<Void> deleteMyAccount(Principal principal) {
+        Long userId = Long.parseLong(principal.getName());
+        userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -46,16 +50,16 @@ public class UserController {
      * Update the profile of the authenticated user.
      * The user must be authenticated by JWT token.
      *
-     * @param jwtUserPrincipal the authenticated user by JWT token
+     * @param principal the authenticated user by JWT token
      * @param request the request containing userName, profileImage to update
      * @return updated user info as UserResponse.
      */
     @PatchMapping("/me/profile")
     public ResponseEntity<UserResponse> updateMyProfile(
-            @AuthenticationPrincipal JwtUserPrincipal jwtUserPrincipal,
+            Principal principal,
             @RequestBody UpdateProfileRequest request) {
-        UserResponse userResponse = userService.updateProfile(
-                jwtUserPrincipal.id(), request);
+        Long userId = Long.parseLong(principal.getName());
+        UserResponse userResponse = userService.updateProfile(userId, request);
         return ResponseEntity.ok(userResponse);
     }
 }

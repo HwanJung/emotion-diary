@@ -1,14 +1,15 @@
-package hwan.diary.security.jwt.service;
+package hwan.diary.security.jwt.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
 
-@Service
+@Repository
 @RequiredArgsConstructor
-public class RefreshTokenService {
+public class RefreshTokenRepository {
 
     private final RedisTemplate<String, String> redisTemplate;
 

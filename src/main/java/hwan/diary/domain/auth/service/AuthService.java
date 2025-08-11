@@ -6,7 +6,7 @@ import hwan.diary.domain.auth.dto.response.TokenResponse;
 import hwan.diary.common.exception.token.RefreshTokenMismatchException;
 import hwan.diary.common.exception.token.RefreshTokenNotFoundException;
 import hwan.diary.domain.user.service.UserService;
-import hwan.diary.security.jwt.service.RefreshTokenService;
+import hwan.diary.security.jwt.repository.RefreshTokenRepository;
 import hwan.diary.security.jwt.token.JwtProvider;
 import hwan.diary.security.jwt.token.TokenType;
 import io.jsonwebtoken.Claims;
@@ -22,7 +22,7 @@ public class AuthService {
 
     private final JwtProvider jwtProvider;
     private final UserService userService;
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     /**
      * Handles user login request.
@@ -38,7 +38,7 @@ public class AuthService {
         String accessToken = jwtProvider.generateToken(uid, TokenType.ACCESS);
         String refreshToken = jwtProvider.generateToken(uid, TokenType.REFRESH);
 
-        refreshTokenService.save(uid, refreshToken);
+        refreshTokenRepository.save(uid, refreshToken);
 
         return new TokenResponse("Bearer", accessToken, refreshToken);
     }
@@ -49,7 +49,7 @@ public class AuthService {
      * @param uid id of user to logout
      */
     public void logout(Long uid) {
-        refreshTokenService.delete(uid);
+        refreshTokenRepository.delete(uid);
     }
 
     /**
@@ -67,7 +67,7 @@ public class AuthService {
 
         Long uid = jwtProvider.getUserIdFromClaims(claims, TokenType.REFRESH);
 
-        String savedRefreshToken = refreshTokenService.get(uid);
+        String savedRefreshToken = refreshTokenRepository.get(uid);
 
         if(savedRefreshToken == null) {
             throw new RefreshTokenNotFoundException(uid);
