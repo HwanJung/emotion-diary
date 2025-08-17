@@ -2,11 +2,13 @@ version: "3.8"
 services:
   postgres:
     image: postgres:17
-    container_name: backend-postgres
+    container_name: postgres
     env_file:
-      - .env
+      - ./.env
+    environment:
+      POSTGRES_INITDB_ARGS: "--lc-messages=C --encoding=UTF8"
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: unless-stopped
@@ -19,3 +21,4 @@ services:
 
 volumes:
   pgdata:
+    name: pgdata
