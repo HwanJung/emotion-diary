@@ -4,19 +4,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hwan.diary.domain.auth.dto.request.OAuthUserRequest;
 import hwan.diary.domain.user.values.Provider;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
-@AutoConfigureMockMvc
+//@ActiveProfiles("test")
+//@Testcontainers
+@AutoConfigureMockMvc(addFilters = true)
+@Transactional
 public class AuthControllerIntegrationTest {
 
     @Autowired
@@ -26,7 +32,7 @@ public class AuthControllerIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void testLogin() throws Exception {
+    void login_whenNeedToRegister_thenReturnsAccessTokenAndRefreshToken() throws Exception {
         OAuthUserRequest request = new OAuthUserRequest(
             "testname",
             Provider.GOOGLE,
@@ -40,6 +46,7 @@ public class AuthControllerIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.tokenType").value("Bearer"))
             .andExpect(jsonPath("$.accessToken").exists());
-
     }
+
+
 }

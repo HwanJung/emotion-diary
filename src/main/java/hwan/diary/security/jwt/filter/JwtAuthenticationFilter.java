@@ -12,12 +12,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * JWT authentication filter.
@@ -30,7 +37,21 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+
     private final JwtProvider jwtProvider;
+
+    private static final PathPatternRequestMatcher.Builder P =
+        PathPatternRequestMatcher.withDefaults(); // ← 여기!
+
+    private static final RequestMatcher WHITELIST = new OrRequestMatcher(
+        P.matcher(HttpMethod.POST, "/api/auth/login"),
+        P.matcher(HttpMethod.POST, "/api/auth/reissue")
+    );
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return WHITELIST.matches(request);
+    }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
