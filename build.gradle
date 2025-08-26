@@ -41,12 +41,11 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation "org.springframework.boot:spring-boot-testcontainers" // Boot 3.1+
+    testImplementation "org.testcontainers:junit-jupiter"
+    testImplementation "org.testcontainers:postgresql"
+    testImplementation "com.redis:testcontainers-redis:2.2.4"
 
-    testImplementation 'org.testcontainers:junit-jupiter'
-    testImplementation 'org.testcontainers:postgresql'
-
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testImplementation platform('org.junit:junit-bom')
 }
 
 tasks.named('test') {

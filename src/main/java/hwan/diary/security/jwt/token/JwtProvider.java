@@ -8,6 +8,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,11 +26,11 @@ public class JwtProvider {
     private final long refreshTokenExpirationMs;
     private final SecretKey secretKey;
 
-    public JwtProvider(@Value("${jwt.secret}") String secret,
+    public JwtProvider(@Value("${jwt.secret}") String secretBase64,
                        @Value("${jwt.access-token-expiration-ms}") long accessTokenExpirationMs,
                        @Value("${jwt.refresh-token-expiration-ms}") long refreshTokenExpirationMs
     ) {
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+        this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretBase64));
         this.accessTokenExpirationMs = accessTokenExpirationMs;
         this.refreshTokenExpirationMs = refreshTokenExpirationMs;
     }

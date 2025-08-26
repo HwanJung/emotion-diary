@@ -1,0 +1,34 @@
+// src/test/java/hwan/diary/test/IntegrationTestBase.java
+package hwan.diary.support;
+
+import com.redis.testcontainers.RedisContainer;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
+
+@Testcontainers
+@SpringBootTest
+@ActiveProfiles("test")
+@ExtendWith(SpringExtension.class)
+public abstract class IntegrationTestSupport {
+
+    // Use static so that each test class reuses the same containers (faster)
+    @Container
+    @ServiceConnection // wires spring.datasource.* automatically
+    protected static final PostgreSQLContainer<?> POSTGRES =
+        new PostgreSQLContainer<>(DockerImageName.parse("postgres:17"));
+
+    @Container
+    @ServiceConnection // wires spring.data.redis.* automatically
+    protected static final RedisContainer REDIS =
+        new RedisContainer(RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG));
+
+    // Tip: If you want local reuse between runs (NOT recommended on CI):
+    // static { POSTGRES.withReuse(true); REDIS.withReuse(true); }
+}
