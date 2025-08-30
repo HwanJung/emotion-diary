@@ -16,7 +16,7 @@ import org.testcontainers.utility.DockerImageName;
 @SpringBootTest
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
-public abstract class IntegrationTestSupport {
+public abstract class IntegrationTestBase {
 
     // Use static so that each test class reuses the same containers (faster)
     @Container

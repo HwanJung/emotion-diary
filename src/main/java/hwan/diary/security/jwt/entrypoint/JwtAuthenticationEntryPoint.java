@@ -9,7 +9,9 @@ import hwan.diary.common.exception.token.TokenMissingException;
 import hwan.diary.common.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -22,9 +24,10 @@ import java.io.IOException;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     @Override
     public void commence(HttpServletRequest request,
@@ -34,9 +37,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         Exception exception = (Exception) request.getAttribute("jwt_exception");
 
         ErrorResponse errorResponse;
-
-        String uri = request.getRequestURI();
-        String ipAddress = request.getRemoteAddr();
 
         if(exception instanceof TokenException tokenException) {
             ErrorCode errorCode = tokenException.getErrorCode();

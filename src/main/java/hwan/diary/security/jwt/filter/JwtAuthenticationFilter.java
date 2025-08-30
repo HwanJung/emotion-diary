@@ -15,7 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
@@ -37,11 +39,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-
     private final JwtProvider jwtProvider;
+    private final AuthenticationEntryPoint entryPoint;
 
     private static final PathPatternRequestMatcher.Builder P =
-        PathPatternRequestMatcher.withDefaults(); // ← 여기!
+        PathPatternRequestMatcher.withDefaults();
 
     private static final RequestMatcher WHITELIST = new OrRequestMatcher(
         P.matcher(HttpMethod.POST, "/api/auth/login"),
@@ -72,11 +74,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
         } catch (TokenException e) {
-            SecurityContextHolder.clearContext(); // clear authentication info
+            SecurityContextHolder.clearContext();
 
             request.setAttribute("jwt_exception", e);
 
-            throw new InsufficientAuthenticationException(e.getMessage(), e);
+            entryPoint.commence(request, response, new InsufficientAuthenticationException(e.getMessage(), e));
+        } catch (Exception e) {
+            SecurityContextHolder.clearContext();
+
+            throw e;
         }
     }
 

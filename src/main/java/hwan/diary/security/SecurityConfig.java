@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -37,8 +38,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtProvider jwtProvider) {
-        return new JwtAuthenticationFilter(jwtProvider);
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtProvider jwtProvider, AuthenticationEntryPoint authenticationEntryPoint) {
+        return new JwtAuthenticationFilter(jwtProvider, authenticationEntryPoint);
     }
 
     @Bean

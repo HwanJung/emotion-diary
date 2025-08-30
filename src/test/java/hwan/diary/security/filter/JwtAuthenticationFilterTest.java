@@ -8,6 +8,7 @@ import hwan.diary.security.jwt.principal.JwtAuthenticationToken;
 import hwan.diary.security.jwt.token.JwtProvider;
 import hwan.diary.security.jwt.token.TokenType;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.FilterChain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,18 +21,23 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 
 import java.time.Instant;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class JwtAuthenticationFilterTest {
 
     @Mock
     private JwtProvider jwtProvider;
+
+    @Mock
+    private AuthenticationEntryPoint authenticationEntryPoint;
 
     @InjectMocks
     private JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -46,6 +52,19 @@ public class JwtAuthenticationFilterTest {
         response = new MockHttpServletResponse();
         filterChain = new MockFilterChain();
         SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void shouldSkipFilter_forWhitelistedLoginPath() throws Exception {
+        request = new MockHttpServletRequest("POST", "/api/auth/login");
+        response = new MockHttpServletResponse();
+
+        jwtAuthenticationFilter.doFilter(request, response, filterChain);
+
+        verify(jwtProvider, never()).parseClaims(any(), any());
+        verify(authenticationEntryPoint, never()).commence(any(), any(), any());
+        verify(filterChain, times(1)).doFilter(any(), any());
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
     }
 
     @Test
