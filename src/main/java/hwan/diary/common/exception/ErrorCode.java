@@ -30,7 +30,9 @@ public enum ErrorCode {
     REFRESH_TOKEN_NOT_FOUND("REFRESH_TOKEN_NOT_FOUND", "Refresh token not found", HttpStatus.UNAUTHORIZED),
 
     // When handle UserNotFoundException
-    USER_NOT_FOUND("USER_NOT_FOUND", "Requested user is not exist", HttpStatus.NOT_FOUND);
+    USER_NOT_FOUND("USER_NOT_FOUND", "Requested user is not exist", HttpStatus.NOT_FOUND),
+
+    DIARY_NOT_FOUND("DIARY_NOT_FOUND", "Requested diary is not exist", HttpStatus.NOT_FOUND);
 
     private final String code;
     private final String message;
