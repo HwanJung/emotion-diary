@@ -36,7 +36,7 @@ public class DiaryService {
             createDiaryCommand.title(),
             createDiaryCommand.content(),
             createDiaryCommand.imageKey(),
-            createDiaryCommand.date()
+            createDiaryCommand.diaryDate()
         );
 
         diaryRepository.save(diary);
@@ -59,7 +59,8 @@ public class DiaryService {
     }
 
     /**
-     * Find slice of all diaries by userId.
+     * Find slice of diaries by userId.
+     * A page size is the requested size. A default size is 10.
      *
      * @param userId the id of owner
      * @param pageable paging info
@@ -94,7 +95,7 @@ public class DiaryService {
             diary.changeImage(cmd.newImageKey());
         }
 
-        diary.update(cmd.title(), cmd.content(), cmd.date());
+        diary.update(cmd.title(), cmd.content(), cmd.diaryDate());
 
         return DiaryMapper.toDiaryDto(diary);
     }

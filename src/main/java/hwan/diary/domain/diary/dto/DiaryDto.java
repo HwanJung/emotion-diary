@@ -10,6 +10,6 @@ public record DiaryDto(
     String title,
     String content,
     String imageKey,
-    LocalDate date
+    LocalDate diaryDate
 ) {
 }

@@ -37,7 +37,7 @@ public class DiaryController {
 
     @GetMapping("/{id}")
     public DiaryDto getDiary(
-        @PathVariable Long id,
+        @PathVariable("id") Long id,
         Principal principal
     ) {
         Long userId = Long.parseLong(principal.getName());
@@ -67,7 +67,7 @@ public class DiaryController {
     @PutMapping("/{id}")
     public ResponseEntity<DiaryDto> updateDiary(
         Principal principal,
-        @PathVariable Long id,
+        @PathVariable("id") Long id,
         @Valid @RequestBody UpdateDiaryRequest request
     ) {
         Long userId = Long.parseLong(principal.getName());
@@ -81,7 +81,7 @@ public class DiaryController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDiary(
         Principal principal,
-        @PathVariable Long id
+        @PathVariable("id") Long id
     ) {
         Long userId = Long.parseLong(principal.getName());
 

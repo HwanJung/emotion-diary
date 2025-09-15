@@ -12,5 +12,5 @@ public record CreateDiaryRequest(
     @NotBlank @Size(max = 10_000) String content,
     @Size(max = 2048) String objectKey,
     @NotBlank @PastOrPresent @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    LocalDate date
+    LocalDate diaryDate
     ) {}

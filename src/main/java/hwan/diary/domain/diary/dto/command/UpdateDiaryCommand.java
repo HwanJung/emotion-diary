@@ -11,11 +11,11 @@ import java.time.LocalDate;
 public record UpdateDiaryCommand(
     String title,
     String content,
-    LocalDate date,
+    LocalDate diaryDate,
     String newImageKey,
     boolean clearImage
 ) {
     public static UpdateDiaryCommand of(UpdateDiaryRequest request) {
-        return new UpdateDiaryCommand(request.title(), request.content(), request.date(), request.newImageKey(), request.clearImage());
+        return new UpdateDiaryCommand(request.title(), request.content(), request.diaryDate(), request.newImageKey(), request.clearImage());
     }
 }
