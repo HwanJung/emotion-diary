@@ -41,7 +41,4 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, length = 100)
     private String email;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "user")
-    private List<Diary> diaries = new ArrayList<>();
 }
