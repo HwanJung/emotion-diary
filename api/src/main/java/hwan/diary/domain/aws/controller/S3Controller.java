@@ -1,6 +1,5 @@
 package hwan.diary.domain.aws.controller;
 
-import com.fasterxml.jackson.datatype.jsr310.deser.JSR310StringParsableDeserializer;
 import hwan.diary.domain.aws.dto.PresignedPutResponse;
 import hwan.diary.domain.aws.service.S3Service;
 import lombok.RequiredArgsConstructor;

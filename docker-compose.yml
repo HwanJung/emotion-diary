@@ -1,0 +1,80 @@
+services:
+  reverse-proxy:
+    image: caddy:2
+    container_name: reverse-proxy
+    restart: unless-stopped
+    ports: ["80:80","443:443"]
+    volumes:
+      - ./reverse-proxy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    command: ["caddy","run","--config","/etc/caddy/Caddyfile","--adapter","caddyfile","${DOMAIN}"]
+    networks: [appnet]
+
+  web:
+    image: ghcr.io/yourorg/your-web:latest
+    container_name: web
+    restart: unless-stopped
+    env_file: .env
+    depends_on: [api]
+    networks: [appnet]
+
+  api:
+    image: ghcr.io/yourorg/your-api:latest
+    container_name: api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SERVER_PORT=8080
+
+      - SPRING_DATA_REDIS_HOST=${REDIS_HOST}
+      - SPRING_DATA_REDIS_PORT=${REDIS_PORT}
+      - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD}
+
+      - AWS_REGION=${S3_REGION}
+      - S3_BUCKET=${S3_BUCKET}
+
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - JWT_SECRET=${JWT_SECRET}
+    expose: ["8080"]
+    depends_on: [redis]
+    healthcheck:
+      test: ["CMD","curl","-f","http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+    networks: [appnet]
+
+  # (선택) 초기는 컨테이너 Redis로 운영. 외부 포트 노출하지 않음
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    command: >
+      sh -c "redis-server
+             --appendonly yes
+             --save 60 1000
+             --protected-mode yes
+             --requirepass ${REDIS_PASSWORD}"
+    env_file: .env
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD","redis-cli","-a","${REDIS_PASSWORD}","ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+    networks: [appnet]
+
+networks:
+  appnet:
+
+volumes:
+  caddy_data:
+  caddy_config:
+  redis_data:

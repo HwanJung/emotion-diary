@@ -1,0 +1,25 @@
+{
+  email you@example.com
+}
+
+https://{args.0} {
+  encode gzip
+  @api path /api/* /actuator/*
+  handle @api {
+    reverse_proxy api:8080
+  }
+  handle {
+    reverse_proxy web:3000
+  }
+  log
+}
+
+https://api.{args.0} {
+  encode gzip
+  reverse_proxy api:8080
+  log
+}
+
+http://{args.0}, http://api.{args.0} {
+  redir https://{host}{uri}
+}
