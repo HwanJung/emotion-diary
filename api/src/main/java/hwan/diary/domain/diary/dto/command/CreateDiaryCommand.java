@@ -11,6 +11,6 @@ public record CreateDiaryCommand(
     LocalDate diaryDate
 ) {
     public static CreateDiaryCommand from(CreateDiaryRequest request) {
-        return new CreateDiaryCommand(request.title(), request.content(), request.objectKey(), request.diaryDate());
+        return new CreateDiaryCommand(request.title(), request.content(), request.imageKey(), request.diaryDate());
     }
 }

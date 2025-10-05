@@ -10,7 +10,7 @@ import java.time.LocalDate;
 public record CreateDiaryRequest(
     @NotBlank @Size(max = 100) String title,
     @NotBlank @Size(max = 10_000) String content,
-    @Size(max = 2048) String objectKey,
+    @Size(max = 2048) String imageKey,
     @NotBlank @PastOrPresent @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     LocalDate diaryDate
     ) {}
