@@ -1,0 +1,174 @@
+/**
+ * @file styles/Header.module.css
+ * @description 헤더 컴포넌트 스타일 - CSS Modules.
+ */
+
+.header {
+    background-color: white;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+    border-bottom: 1px solid #e5e7eb; /* border-b */
+}
+
+.container {
+    max-width: 1200px; /* container */
+    margin-left: auto; /* mx-auto */
+    margin-right: auto; /* mx-auto */
+    padding-left: 1rem; /* px-4 */
+    padding-right: 1rem; /* px-4 */
+    padding-top: 1rem; /* py-4 */
+    padding-bottom: 1rem; /* py-4 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* ��응형을 위해 추가 */
+}
+
+.leftSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* space-x-4 */
+    flex-wrap: wrap; /* 반응형을 위해 추가 */
+}
+
+.title {
+    font-size: 1.25rem; /* text-xl */
+    font-weight: 700; /* font-bold */
+    color: #111827; /* text-gray-900 */
+    text-decoration: none; /* Link 스타일 제거 */
+    white-space: nowrap; /* 줄바꿈 방지 */
+}
+
+/* 내비게이션 스타일 */
+.navigation {
+    display: flex;
+    gap: 1rem; /* space-x-4 */
+    flex-wrap: wrap; /* 반응형을 위해 추가 */
+}
+
+.navLink {
+    color: #4b5563; /* text-gray-600 */
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    white-space: nowrap; /* 줄바꿈 방지 */
+}
+
+.navLink:hover {
+    color: #111827; /* text-gray-900 */
+}
+
+.rightSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* space-x-4 */
+}
+
+.avatarButton {
+    position: relative;
+    height: 2.5rem; /* h-10 */
+    width: 2.5rem; /* w-10 */
+    border-radius: 9999px; /* rounded-full */
+    background-color: #f3f4f6; /* bg-gray-100 */
+    transition: background-color 0.2s ease;
+}
+
+.avatarButton:hover {
+    background-color: #e5e7eb; /* hover:bg-gray-200 */
+}
+
+.avatar {
+    height: 2rem; /* h-8 */
+    width: 2rem; /* w-8 */
+}
+
+.avatarFallbackIcon {
+    height: 1rem; /* h-4 */
+    width: 1rem; /* w-4 */
+}
+
+.dropdownContent {
+    width: 14rem; /* w-56 */
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem; /* gap-2 */
+    padding: 0.5rem; /* p-2 */
+}
+
+.userNameEmail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem; /* space-y-1 */
+    line-height: 1; /* leading-none */
+}
+
+.userName {
+    font-weight: 500; /* font-medium */
+}
+
+.userEmail {
+    width: 200px; /* w-[200px] */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; /* truncate */
+    font-size: 0.875rem; /* text-sm */
+    color: #6b7280; /* text-muted-foreground */
+}
+
+.logoutIcon {
+    margin-right: 0.5rem; /* mr-2 */
+    height: 1rem; /* h-4 */
+    width: 1rem; /* w-4 */
+}
+
+.dropdownMenuItem {
+    /* 기존 shadcn/ui 스타일과 충돌을 피하기 위해, 필요하다면 !important를 사용할 수 있지만 우선순위를 높이는 것으로 해결 시도 */
+}
+
+.dropdownMenuItem:hover {
+    background-color: #f3f4f6 !important; /* hover:bg-gray-100, !important를 사용하여 다른 스타일을 덮어쓰기 */
+    cursor: pointer !important;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .leftSection {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .navigation {
+        width: 100%;
+        justify-content: space-around;
+        margin-top: 0.5rem;
+        gap: 0.5rem;
+    }
+
+    .navLink {
+        padding: 0.25rem 0.5rem;
+    }
+
+    .rightSection {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .title {
+        font-size: 1.1rem;
+    }
+
+    .navLink {
+        font-size: 0.875rem;
+    }
+}
