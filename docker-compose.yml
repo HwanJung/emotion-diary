@@ -17,10 +17,11 @@ services:
     restart: unless-stopped
     env_file: .env
     depends_on: [api]
+    expose: ["3000"]
     networks: [appnet]
 
   api:
-    image: ghcr.io/yourorg/your-api:latest
+    image: ghcr.io/hwanjung/emotion-diary-api:latest
     container_name: api
     restart: unless-stopped
     env_file: .env
@@ -34,11 +35,11 @@ services:
       - SPRING_DATA_REDIS_PORT=${REDIS_PORT}
       - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD}
 
-      - AWS_REGION=${S3_REGION}
+      - AWS_REGION=${AWS_REGION}
       - S3_BUCKET=${S3_BUCKET}
 
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
-      - JWT_SECRET=${JWT_SECRET}
+      - JWT_SECRET_BASE64=${JWT_SECRET_BASE64}
     expose: ["8080"]
     depends_on: [redis]
     healthcheck:
@@ -49,7 +50,6 @@ services:
       start_period: 20s
     networks: [appnet]
 
-  # (선택) 초기는 컨테이너 Redis로 운영. 외부 포트 노출하지 않음
   redis:
     image: redis:7-alpine
     container_name: redis
