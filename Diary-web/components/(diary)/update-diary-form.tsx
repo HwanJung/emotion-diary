@@ -7,6 +7,7 @@ import {getS3DownloadUrl, getS3PresignedUrl, updateDiary} from "@/lib/client-api
 import ImageUploader from "@/components/ui/image-uploader";
 import FormActions from "@/components/ui/form-actions";
 import { DiaryEntry } from "@/types/diary";
+import {UpdateDiaryRequest} from "../../types/diary";
 
 interface UpdateDiaryFormProps {
   initialDiary: DiaryEntry;
