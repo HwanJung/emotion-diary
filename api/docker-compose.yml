@@ -3,7 +3,7 @@ services:
     image: postgres:17
     container_name: postgres
     env_file:
-      - ./.env
+      - .env.local
     environment:
       POSTGRES_INITDB_ARGS: "--lc-messages=C --encoding=UTF8"
     ports:
@@ -24,7 +24,7 @@ services:
     ports:
       - "6379:6379"
     env_file:
-      - ./.env
+      - .env.local
     command: >
       sh -c "redis-server
              --appendonly yes                  

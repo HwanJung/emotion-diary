@@ -11,7 +11,7 @@
 HELP.md
 
 # env file
-.env
+.env.local
 
 # window용 wrapper라 필요 없음.
 gradlew.bat
