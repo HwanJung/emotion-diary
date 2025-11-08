@@ -13,5 +13,5 @@ HELP.md
 # env file
 .env.local
 
-# docker-compose.yml
-docker-compose.yml
+# docker-compose.local.yml
+docker-compose.local.yml
