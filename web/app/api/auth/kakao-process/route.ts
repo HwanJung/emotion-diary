@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { setCookie } from "nookies"
 
 /**
  * @file app/api/auth/kakao-process/route.ts

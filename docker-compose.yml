@@ -8,7 +8,7 @@ services:
       - ./reverse-proxy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
-    command: ["caddy","run","--config","/etc/caddy/Caddyfile","--adapter","caddyfile","${DOMAIN}"]
+    depends_on: [web]
     networks: [appnet]
 
   web:
@@ -39,7 +39,7 @@ services:
       - S3_BUCKET=${S3_BUCKET}
 
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
-      - JWT_SECRET_BASE64=${JWT_SECRET_BASE64}
+      - JWT_SECRET=${JWT_SECRET_BASE64}
     expose: ["8080"]
     depends_on: [redis]
     healthcheck:
@@ -56,8 +56,7 @@ services:
     restart: unless-stopped
     command: >
       sh -c "redis-server
-             --appendonly yes
-             --save 60 1000
+             --appendonly no
              --protected-mode yes
              --requirepass ${REDIS_PASSWORD}"
     env_file: .env
