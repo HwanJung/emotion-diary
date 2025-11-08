@@ -3,6 +3,6 @@
 }
 emotiondiary.duckdns.org {
     encode zstd gzip
-    reverse_proxy web:3000
+    reverse_proxy api:8080
 }
 

@@ -13,5 +13,5 @@ HELP.md
 # env file
 .env.local
 
-# window용 wrapper라 필요 없음.
-gradlew.bat
+# docker-compose.yml
+docker-compose.yml
