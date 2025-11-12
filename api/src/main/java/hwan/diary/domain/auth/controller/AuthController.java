@@ -7,6 +7,7 @@ import hwan.diary.domain.auth.dto.request.OAuthUserRequest;
 import hwan.diary.security.jwt.principal.JwtUserPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -31,7 +33,9 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@RequestBody OAuthUserRequest request) {
+        log.debug("[auth/login] attempt email={}", request.email());
         TokenResponse tokenResponse = authService.login(request);
+        log.info("[auth/login] success. email={}", request.email());
         return ResponseEntity.ok(tokenResponse);
     }
 
