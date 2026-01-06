@@ -34,7 +34,7 @@ public class Diary extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(length = 2048)
+    @Column(name = "image_key",length = 2048)
     private String imageKey;
 
     @Column(name = "diary_date", nullable = false)

@@ -1,4 +1,3 @@
-// src/test/java/hwan/diary/test/IntegrationTestBase.java
 package hwan.diary.support;
 
 import com.redis.testcontainers.RedisContainer;

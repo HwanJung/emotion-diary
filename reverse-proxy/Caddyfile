@@ -1,15 +1,22 @@
 {
-  email jh013188@gmail.com
-}
-emotiondiary-api.duckdns.org {
-    encode zstd gzip
+    email jh013188@gmail.com
 
     log {
         output stdout
-        format console
+        format json
     }
+}
+3.36.70.16.nip.io {
+    encode zstd gzip
 
-    # API 컨테이너로 reverse proxy
-    reverse_proxy api:8080
+    @http protocol http
+        redir @http https://{host}{uri} permanent
+
+    reverse_proxy api:8080 {
+        header_up Host {host}
+        header_up X-Forwarded-Host {host}
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Real-IP {remote_host}
+    }
 }
 

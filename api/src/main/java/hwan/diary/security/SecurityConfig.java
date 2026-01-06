@@ -67,13 +67,13 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(
+        config.setAllowedOriginPatterns(
             Arrays.stream(allowedOrigins.split(","))
                 .map(String::trim)
                 .toList()
         );
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedHeaders(List.of("Authorization", "Refresh-Token", "Content-Type"));
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);
 
