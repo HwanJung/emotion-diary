@@ -9,6 +9,8 @@ import hwan.diary.domain.diary.dto.response.SliceResponse;
 import hwan.diary.domain.diary.entity.Diary;
 import hwan.diary.domain.diary.repository.DiaryRepository;
 import hwan.diary.domain.diary.util.DiaryMapper;
+import hwan.diary.domain.user.entity.User;
+import hwan.diary.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DiaryService {
 
     private final DiaryRepository diaryRepository;
+    private final UserRepository userRepository;
 
     /**
      * Create a new {@link Diary} for the given user and save to DB.
@@ -31,8 +34,10 @@ public class DiaryService {
      */
     @Transactional
     public DiaryDto createDiary(CreateDiaryCommand createDiaryCommand, Long userId) {
+        User userRef = userRepository.getReferenceById(userId);
+
         Diary diary = Diary.create(
-            userId,
+            userRef,
             createDiaryCommand.title(),
             createDiaryCommand.content(),
             createDiaryCommand.imageKey(),
@@ -68,7 +73,7 @@ public class DiaryService {
      */
     @Transactional(readOnly = true)
     public SliceResponse<DiaryDto> findDiaries(Long userId, Pageable pageable) {
-        int size = Math.min(Math.max(pageable.getPageSize(), 1), 100); // 1..100 제한
+        int size = Math.min(Math.max(pageable.getPageSize(), 1), 100);
         Pageable p = PageRequest.of(pageable.getPageNumber(), size);
 
         Slice<DiaryDto> slice = diaryRepository.findSliceByUserId(userId, p)
@@ -109,7 +114,7 @@ public class DiaryService {
     @Transactional
     public void deleteDiary(Long userId, Long id) {
         Diary diary = findDiaryByIdAndUserIdInternal(id, userId);
-        diaryRepository.delete(diary);
+        diary.softDelete();
     }
 
     /* helper */
@@ -126,7 +131,7 @@ public class DiaryService {
      * @throws {@link DiaryNotFoundException} if not found or not owned by userId
      */
     private Diary findDiaryByIdAndUserIdInternal(Long id, Long userId) {
-        return diaryRepository.findByIdAndUserId(id, userId)
+        return diaryRepository.findByIdAndUserIdAndDeletedFalse(id, userId)
             .orElseThrow(() -> new DiaryNotFoundException(ErrorCode.DIARY_NOT_FOUND, id, userId));
     }
 }

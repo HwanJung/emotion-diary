@@ -147,13 +147,15 @@ public class DiaryControllerTest {
 
     @Test
     void deleteDiary_return204_andBody() throws Exception {
+        // given
+        willDoNothing().given(diaryService).deleteDiary(USER_ID, DIARY_ID);
+
         // when & then
         mvc.perform(delete("/api/diaries/{id}", DIARY_ID)
                 .principal(principal))
             .andExpect(status().isNoContent());
 
-        verify(diaryService, times(1)).deleteDiary(USER_ID, DIARY_ID);
-        verifyNoMoreInteractions(diaryService);
+        verify(diaryService).deleteDiary(USER_ID, DIARY_ID);
     }
 
     @Test

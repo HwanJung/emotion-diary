@@ -2,7 +2,9 @@ package hwan.diary.domain.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hwan.diary.domain.auth.dto.request.OAuthUserRequest;
+import hwan.diary.domain.user.entity.SnsAccount;
 import hwan.diary.domain.user.entity.User;
+import hwan.diary.domain.user.repository.SnsAccountRepository;
 import hwan.diary.domain.user.repository.UserRepository;
 import hwan.diary.domain.user.values.Provider;
 import hwan.diary.support.IntegrationTestBase;
@@ -36,19 +38,27 @@ class AuthControllerIT extends IntegrationTestBase {
     @Autowired JdbcTemplate jdbc;
     @Autowired StringRedisTemplate redis;
     @Autowired UserRepository userRepository;
+    @Autowired SnsAccountRepository accountRepository;
 
     @BeforeEach
     void setUp() {
         // clear DB and add one user
         jdbc.execute("TRUNCATE TABLE users RESTART IDENTITY CASCADE");
 
-        userRepository.save(
-            User.builder()
-                .username("ExistingUser")
-                .provider(Provider.GOOGLE)
-                .providerId("google-9999")
-                .email("existingUser@gmail.com")
-                .build()
+        User user = userRepository.save(
+            User.create(
+                "ExistringUser",
+                "existingUser@gmail.com"
+            )
+        );
+
+        accountRepository.save(
+            SnsAccount.create(
+                user,
+                Provider.GOOGLE,
+                "google-9999",
+                "existingUser@gmail.com"
+            )
         );
 
         // clear Redis
@@ -76,12 +86,12 @@ class AuthControllerIT extends IntegrationTestBase {
 
         // DB state: existing user 1 + new user 1
         Integer cnt = jdbc.queryForObject(
-            "select count(*) from users where provider = ? and provider_id = ?",
+            "select count(*) from sns_accounts where provider = ? and provider_id = ?",
             Integer.class, "GOOGLE", "google-1234");
         assertThat(cnt).isEqualTo(1);
 
         Long userId = jdbc.queryForObject(
-            "select id from users where provider=? and provider_id=?",
+            "select user_id from sns_accounts where provider=? and provider_id=?",
             Long.class, "GOOGLE", "google-1234");
 
         // check generated refresh token
@@ -105,12 +115,12 @@ class AuthControllerIT extends IntegrationTestBase {
         );
 
         Integer before = jdbc.queryForObject(
-            "select count(*) from users where provider=? and provider_id=?",
+            "select count(*) from sns_accounts where provider=? and provider_id=?",
             Integer.class, "GOOGLE", "google-9999");
         assertThat(before).isEqualTo(1);
 
         Long userIdBefore = jdbc.queryForObject(
-            "select id from users where provider=? and provider_id=?",
+            "select user_id from sns_accounts where provider=? and provider_id=?",
             Long.class, "GOOGLE", "google-9999");
 
         var mvcRes = mvc.perform(post("/api/auth/login")
@@ -122,12 +132,12 @@ class AuthControllerIT extends IntegrationTestBase {
             .andReturn();
 
         Integer after = jdbc.queryForObject(
-            "select count(*) from users where provider=? and provider_id=?",
+            "select count(*) from sns_accounts where provider=? and provider_id=?",
             Integer.class, "GOOGLE", "google-9999");
         assertThat(after).isEqualTo(1);
 
         Long userIdAfter = jdbc.queryForObject(
-            "select id from users where provider=? and provider_id=?",
+            "select user_id from sns_accounts where provider=? and provider_id=?",
             Long.class, "GOOGLE", "google-9999");
         assertThat(userIdAfter).isEqualTo(userIdBefore);
 

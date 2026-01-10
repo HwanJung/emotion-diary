@@ -64,7 +64,7 @@ public class AuthControllerTest {
             "refresh-token"
         );
 
-        given(authService.login(any(OAuthUserRequest.class))).willReturn(tokenResponse);
+        given(authService.loginOrSignUp(any(OAuthUserRequest.class))).willReturn(tokenResponse);
 
         // when & then
         mockMvc.perform(post("/api/auth/login")
@@ -96,11 +96,14 @@ public class AuthControllerTest {
             "Bearer",
             "access-token"
         );
+        String refreshToken = "refresh_token";
 
-        given(authService.reissueAccessToken(any(HttpServletRequest.class))).willReturn(accessTokenResponse);
+        given(authService.reissueAccessToken(refreshToken)).willReturn(accessTokenResponse);
 
         // when & then
-        mockMvc.perform(post("/api/auth/reissue"))
+        mockMvc.perform(post("/api/auth/reissue")
+            .header("Refresh-Token", refreshToken)
+            .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.tokenType").value("Bearer"))
             .andExpect(jsonPath("$.accessToken").value("access-token"));

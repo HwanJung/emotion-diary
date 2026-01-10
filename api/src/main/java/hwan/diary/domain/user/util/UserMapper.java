@@ -9,9 +9,7 @@ public class UserMapper {
         return new UserResponse(
             user.getId(),
             user.getUsername(),
-            user.getProvider().name(),
-            user.getProviderId(),
-            user.getProfileImageUrl(),
+            user.getProfileImageKey(),
             user.getEmail()
         );
     }

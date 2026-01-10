@@ -7,6 +7,8 @@ import hwan.diary.domain.diary.dto.command.UpdateDiaryCommand;
 import hwan.diary.domain.diary.dto.response.SliceResponse;
 import hwan.diary.domain.diary.entity.Diary;
 import hwan.diary.domain.diary.repository.DiaryRepository;
+import hwan.diary.domain.user.entity.User;
+import hwan.diary.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +35,8 @@ public class DiaryServiceTest {
 
     @Mock
     private DiaryRepository diaryRepository;
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private DiaryService diaryService;
@@ -55,7 +59,10 @@ public class DiaryServiceTest {
     // for testing updateDiary
     @BeforeEach
     void setUp() {
-        existingDiary = Diary.create(USER_ID, OLD_TITLE, OLD_CONTENT, OLD_IMAGE, OLD_DATE);
+        User user = User.create("testUser", "test@example.com");
+        ReflectionTestUtils.setField(user, "id", USER_ID);
+
+        existingDiary = Diary.create(user, OLD_TITLE, OLD_CONTENT, OLD_IMAGE, OLD_DATE);
         ReflectionTestUtils.setField(existingDiary, "id", DIARY_ID);
     }
 
@@ -65,6 +72,9 @@ public class DiaryServiceTest {
         CreateDiaryCommand createDiaryCommand = new CreateDiaryCommand(TITLE, CONTENT, IMAGE_KEY, DIARY_DATE);
 
         given(diaryRepository.save(any(Diary.class))).willAnswer(invocation -> null);
+        given(userRepository.getReferenceById(USER_ID)).willReturn(
+            User.create("testUser", "test@example.com")
+        );
 
         // when
         DiaryDto diaryDto = diaryService.createDiary(createDiaryCommand, USER_ID);
@@ -81,36 +91,37 @@ public class DiaryServiceTest {
     @Test
     void findDiary_whenExists_thenReturnDto(){
         // given
-        Diary existingDiary = Diary.create(USER_ID, TITLE, CONTENT, IMAGE_KEY, DIARY_DATE);
-
-        given(diaryRepository.findByIdAndUserId(DIARY_ID, USER_ID)).willReturn(Optional.of(existingDiary));
+        given(diaryRepository.findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID)).willReturn(Optional.of(existingDiary));
 
         // when
         DiaryDto diaryDto = diaryService.findDiary(DIARY_ID, USER_ID);
 
         // then
-        assertEquals(TITLE, diaryDto.title());
-        assertEquals(CONTENT, diaryDto.content());
-        assertEquals(IMAGE_KEY, diaryDto.imageKey());
-        assertEquals(DIARY_DATE, diaryDto.diaryDate());
-        verify(diaryRepository, times(1)).findByIdAndUserId(DIARY_ID, USER_ID);
+        assertEquals(OLD_TITLE, diaryDto.title());
+        assertEquals(OLD_CONTENT, diaryDto.content());
+        assertEquals(OLD_IMAGE, diaryDto.imageKey());
+        assertEquals(OLD_DATE, diaryDto.diaryDate());
+        verify(diaryRepository, times(1)).findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID);
     }
 
     @Test
     void findDiary_whenNotExists_thenThrowsException(){
         // given
-        given(diaryRepository.findByIdAndUserId(DIARY_ID, USER_ID)).willReturn(Optional.empty());
+        given(diaryRepository.findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID)).willReturn(Optional.empty());
 
         // when & then
         assertThrows(DiaryNotFoundException.class, () -> diaryService.findDiary(DIARY_ID, USER_ID));
-        verify(diaryRepository, times(1)).findByIdAndUserId(DIARY_ID, USER_ID);
+        verify(diaryRepository, times(1)).findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID);
     }
 
     @Test
     void findDiaries_whenDataExists_thenMapToDtoAndReturnSliceResponse() {
         // given
-        Diary d1 = Diary.create(USER_ID, "t1", "c1", "img1", DIARY_DATE);
-        Diary d2 = Diary.create(USER_ID, "t2", "c2", "img2", DIARY_DATE2);
+        User user = User.create("testUser", "test@example.com");
+        ReflectionTestUtils.setField(user, "id", USER_ID);
+
+        Diary d1 = Diary.create(user, "t1", "c1", "img1", DIARY_DATE);
+        Diary d2 = Diary.create(user, "t2", "c2", "img2", DIARY_DATE2);
 
         org.springframework.test.util.ReflectionTestUtils.setField(d1, "id", 11L);
         org.springframework.test.util.ReflectionTestUtils.setField(d2, "id", 12L);
@@ -156,7 +167,7 @@ public class DiaryServiceTest {
     @Test
     void updateDiary_whenClearImageTrue_thenImageClearAndUpdateDiary() {
         // given
-        given(diaryRepository.findByIdAndUserId(DIARY_ID, USER_ID)).willReturn(Optional.of(existingDiary));
+        given(diaryRepository.findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID)).willReturn(Optional.of(existingDiary));
 
         LocalDate newDate = LocalDate.of(2025, 9, 2);
         UpdateDiaryCommand cmd = new UpdateDiaryCommand("new title", "new content", newDate, null, true);
@@ -172,14 +183,14 @@ public class DiaryServiceTest {
         assertNull(dto.imageKey());                         // 이미지 제거 확인
         assertNull(existingDiary.getImageKey());            // 엔티티 상태도 변경됨
 
-        verify(diaryRepository, times(1)).findByIdAndUserId(DIARY_ID, USER_ID);
+        verify(diaryRepository, times(1)).findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID);
         verifyNoMoreInteractions(diaryRepository);
     }
 
     @Test
     void updateDiary_whenNewImageKeyDifferent_thenChangeImageAndUpdateDiary() {
         // given
-        given(diaryRepository.findByIdAndUserId(DIARY_ID, USER_ID)).willReturn(Optional.of(existingDiary));
+        given(diaryRepository.findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID)).willReturn(Optional.of(existingDiary));
 
         LocalDate newDate = LocalDate.of(2025, 9, 3);
         UpdateDiaryCommand cmd = new UpdateDiaryCommand("t2", "c2", newDate, "img/new.png", false);
@@ -194,14 +205,14 @@ public class DiaryServiceTest {
         assertEquals(newDate, dto.diaryDate());
         assertEquals("img/new.png", existingDiary.getImageKey()); // 엔티티 변경 확인
 
-        verify(diaryRepository).findByIdAndUserId(DIARY_ID, USER_ID);
+        verify(diaryRepository).findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID);
         verifyNoMoreInteractions(diaryRepository);
     }
 
     @Test
     void updateDiary_whenNewImageKeyNull_thenUpdateDiary() {
         // given
-        given(diaryRepository.findByIdAndUserId(DIARY_ID, USER_ID)).willReturn(Optional.of(existingDiary));
+        given(diaryRepository.findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID)).willReturn(Optional.of(existingDiary));
 
         LocalDate newDate = LocalDate.of(2025, 9, 4);
         UpdateDiaryCommand cmd = new UpdateDiaryCommand("t3", "c3", newDate, null, false);
@@ -216,14 +227,14 @@ public class DiaryServiceTest {
         assertEquals(newDate, dto.diaryDate());
         assertEquals(OLD_IMAGE, existingDiary.getImageKey());
 
-        verify(diaryRepository).findByIdAndUserId(DIARY_ID, USER_ID);
+        verify(diaryRepository).findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID);
         verifyNoMoreInteractions(diaryRepository);
     }
 
     @Test
     void updateDiary_whenNewImageKeySameAsOld_thenUpdateDiary() {
         // given
-        given(diaryRepository.findByIdAndUserId(DIARY_ID, USER_ID)).willReturn(Optional.of(existingDiary));
+        given(diaryRepository.findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID)).willReturn(Optional.of(existingDiary));
 
         LocalDate newDate = LocalDate.of(2025, 9, 5);
         UpdateDiaryCommand cmd = new UpdateDiaryCommand("t4", "c4", newDate, OLD_IMAGE, false);
@@ -238,21 +249,21 @@ public class DiaryServiceTest {
         assertEquals(newDate, dto.diaryDate());
         assertEquals(OLD_IMAGE, existingDiary.getImageKey());
 
-        verify(diaryRepository).findByIdAndUserId(DIARY_ID, USER_ID);
+        verify(diaryRepository).findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID);
         verifyNoMoreInteractions(diaryRepository);
     }
 
     @Test
     void updateDiary_whenNotFound_thenThrowException() {
         // given
-        given(diaryRepository.findByIdAndUserId(DIARY_ID, USER_ID)).willReturn(Optional.empty());
+        given(diaryRepository.findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID)).willReturn(Optional.empty());
         UpdateDiaryCommand cmd = new UpdateDiaryCommand("t", "c", LocalDate.now(), null, false);
 
         // when / then
         assertThrows(DiaryNotFoundException.class,
             () -> diaryService.updateDiary(USER_ID, DIARY_ID, cmd));
 
-        verify(diaryRepository).findByIdAndUserId(DIARY_ID, USER_ID);
+        verify(diaryRepository).findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID);
         verifyNoMoreInteractions(diaryRepository);
     }
 

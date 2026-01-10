@@ -15,10 +15,10 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
 
     @Query("""
         select d from Diary d
-        where d.userId = :userId
+        where d.user.id = :userId and d.deleted=false
         order by d.diaryDate desc, d.id desc
     """)
     Slice<Diary> findSliceByUserId(@Param("userId") Long userId, Pageable pageable);
 
-    Optional<Diary> findByIdAndUserId(Long id, Long userId);
+    Optional<Diary> findByIdAndUserIdAndDeletedFalse(Long id, Long userId);
 }

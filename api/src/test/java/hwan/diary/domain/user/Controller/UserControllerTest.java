@@ -50,8 +50,6 @@ public class UserControllerTest {
         return new UserResponse(
             1L,
             "user",
-            "GOOGLE",
-            "google-1234",
             "profile.jpg",
             "user@google.com"
         );
@@ -69,9 +67,7 @@ public class UserControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(1L))
             .andExpect(jsonPath("$.username").value("user"))
-            .andExpect(jsonPath("$.provider").value("GOOGLE"))
-            .andExpect(jsonPath("$.providerId").value("google-1234"))
-            .andExpect(jsonPath("$.profileImageUrl").value("profile.jpg"))
+            .andExpect(jsonPath("$.profileImageKey").value("profile.jpg"))
             .andExpect(jsonPath("$.email").value("user@google.com"));
 
     }
@@ -98,8 +94,6 @@ public class UserControllerTest {
         UserResponse userResponse = new UserResponse(
             1L,
             "updated_username",
-            "GOOGLE",
-            "google-1234",
             "updated_profile.jpg",
             "user@google.com"
         );
@@ -114,9 +108,7 @@ public class UserControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(1L))
             .andExpect(jsonPath("$.username").value("updated_username"))
-            .andExpect(jsonPath("$.provider").value("GOOGLE"))
-            .andExpect(jsonPath("$.providerId").value("google-1234"))
-            .andExpect(jsonPath("$.profileImageUrl").value("updated_profile.jpg"))
+            .andExpect(jsonPath("$.profileImageKey").value("updated_profile.jpg"))
             .andExpect(jsonPath("$.email").value("user@google.com"));
     }
 

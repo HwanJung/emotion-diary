@@ -5,6 +5,10 @@ import hwan.diary.domain.auth.dto.response.AccessTokenResponse;
 import hwan.diary.domain.auth.dto.response.TokenResponse;
 import hwan.diary.common.exception.token.RefreshTokenMismatchException;
 import hwan.diary.common.exception.token.RefreshTokenNotFoundException;
+import hwan.diary.domain.user.entity.SnsAccount;
+import hwan.diary.domain.user.entity.User;
+import hwan.diary.domain.user.repository.SnsAccountRepository;
+import hwan.diary.domain.user.repository.UserRepository;
 import hwan.diary.domain.user.service.UserService;
 import hwan.diary.security.jwt.repository.RefreshTokenRepository;
 import hwan.diary.security.jwt.token.JwtProvider;
@@ -14,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -21,8 +26,9 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final JwtProvider jwtProvider;
-    private final UserService userService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
+    private final SnsAccountRepository snsAccountRepository;
 
     /**
      * Handles user login request.
@@ -32,9 +38,41 @@ public class AuthService {
      * @param request OAuth login request containing provider info and user details
      * @return a generated access token and refresh token
      */
-    public TokenResponse login(OAuthUserRequest request) {
-        Long uid = userService.findOrRegister(request);
+    @Transactional
+    public TokenResponse loginOrSignUp(OAuthUserRequest request) {
+        Long uid = findOrSaveUser(request);
+        return getTokenResponse(uid);
+    }
 
+    private Long findOrSaveUser(OAuthUserRequest request) {
+        SnsAccount existingSnsAccount = snsAccountRepository
+            .findByProviderAndProviderId(request.provider(), request.providerId())
+            .orElse(null);
+
+        if (existingSnsAccount != null) {
+            return existingSnsAccount.getUser().getId();
+        }
+
+        User user = userRepository.findByEmail(request.email())
+            .orElseGet(() ->
+                userRepository.save(
+                    User.create(request.username(), request.email())
+                )
+            );
+
+
+        SnsAccount snsAccount = SnsAccount.create(
+            user,
+            request.provider(),
+            request.providerId(),
+            request.email()
+        );
+        snsAccountRepository.save(snsAccount);
+
+        return user.getId();
+    }
+
+    private TokenResponse getTokenResponse(Long uid) {
         String accessToken = jwtProvider.generateToken(uid, TokenType.ACCESS);
         String refreshToken = jwtProvider.generateToken(uid, TokenType.REFRESH);
 
@@ -48,31 +86,27 @@ public class AuthService {
      *
      * @param uid id of user to logout
      */
+    @Transactional
     public void logout(Long uid) {
         refreshTokenRepository.delete(uid);
     }
 
     /**
-     * Handles reissue request.
+     * Handles reissuing access token.
      * Check whether the refresh token exists in header, and generate a new access token.
      *
-     * @param request containing refresh token in header.
+     * @param refreshToken containing refresh token in header.
      * @return a generated access token
      */
-    public AccessTokenResponse reissueAccessToken(HttpServletRequest request) {
-
-        String refreshToken = request.getHeader("Refresh-Token");
-
+    @Transactional
+    public AccessTokenResponse reissueAccessToken(String refreshToken) {
         Claims claims = jwtProvider.parseClaims(refreshToken, TokenType.REFRESH);
-
         Long uid = jwtProvider.getUserIdFromClaims(claims, TokenType.REFRESH);
 
         String savedRefreshToken = refreshTokenRepository.get(uid);
-
         if(savedRefreshToken == null) {
             throw new RefreshTokenNotFoundException(uid);
         }
-
         if(!refreshToken.equals(savedRefreshToken)) {
             throw new RefreshTokenMismatchException(uid);
         }

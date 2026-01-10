@@ -1,52 +1,74 @@
 package hwan.diary.domain.diary.entity;
 
-import hwan.diary.common.entity.BaseTimeEntity;
+import hwan.diary.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SoftDelete;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(
     name = "diaries",
     indexes = {
-        @Index(name = "ix_diary_user_date_id", columnList = "user_id, diary_date, id")
+        @Index(name = "idx_diaries__user_id_diary_date", columnList = "user_id, diary_date DESC")
     }
 )
-@SoftDelete(columnName = "deleted")
 @Getter
-@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Diary extends BaseTimeEntity {
+@DynamicInsert
+@EntityListeners(AuditingEntityListener.class)
+public class Diary{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+        name = "user_id",
+        nullable = false,
+        foreignKey = @ForeignKey(name = "fk_diaries__users")
+    )
+    private User user;
 
-    @Column(length = 100, nullable = false)
+    @Column(nullable = false, length = 100)
     private String title;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false)
     private String content;
 
-    @Column(name = "image_key",length = 2048)
+    @Column(length = 255)
     private String imageKey;
 
-    @Column(name = "diary_date", nullable = false)
+    @Column(nullable = false)
     private LocalDate diaryDate;
 
-    public static Diary create(Long userId, String title, String content, String imageKey, LocalDate diaryDate) {
+    @Column(nullable = false)
+    private boolean deleted = false;
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    public static Diary create(User user, String title, String content, String imageKey, LocalDate diaryDate) {
         Diary d = new Diary();
-        d.userId = userId;
+        d.user = user;
         d.title = title;
         d.content = content;
         d.imageKey = imageKey;
         d.diaryDate = diaryDate;
+        d.deleted = false;
         return d;
     }
 
@@ -54,6 +76,10 @@ public class Diary extends BaseTimeEntity {
         this.title = title;
         this.content = content;
         this.diaryDate = diaryDate;
+    }
+
+    public void softDelete() {
+        this.deleted = true;
     }
 
     public void changeImage(String newKey) { this.imageKey = newKey; }
