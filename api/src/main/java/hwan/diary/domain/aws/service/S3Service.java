@@ -25,8 +25,7 @@ public class S3Service {
     @Value("${app.s3.put-exp-min}") long putExpMin;
     @Value("${app.s3.get-exp-min}") long getExpMin;
 
-    public PresignedPutResponse generatePresignedPutUrl(String fileName, String contentType) {
-        // 키 규칙: 접두어 + UUID + 원본 파일명(충돌 방지/운영 편의)
+    public PresignedPutResponse createPutPresignedUrl(String fileName, String contentType) {
         String key = prefix + UUID.randomUUID() + "-" + fileName;
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
@@ -45,15 +44,14 @@ public class S3Service {
         return new PresignedPutResponse(url.toString(), key, contentType);
     }
 
-    // 이미 DB에 저장된 key(객체 경로)를 받아 URL만 발급해 준다.
-    public String createGetUrl(String key) {
+    public String createGetPresignedUrl(String key) {
         GetObjectRequest getReq = GetObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
                 .build();
 
         GetObjectPresignRequest preq = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(getExpMin)) // UX 고려해 15~60분 등
+                .signatureDuration(Duration.ofMinutes(getExpMin))
                 .getObjectRequest(getReq)
                 .build();
 
