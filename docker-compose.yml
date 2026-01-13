@@ -31,7 +31,6 @@ services:
     networks:
       - appnet
 
-
   db:
     image: postgres:16-alpine
     container_name: db
@@ -45,6 +44,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - appnet
+
+  analysis-server:
+    image: ghcr.io/hwanjung/emotion-analysis-server:latest
+    container_name: analysis-server
+    restart: unless-stopped
 
 networks:
   appnet:
