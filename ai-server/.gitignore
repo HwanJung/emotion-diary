@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+venv/
+model/fusion_head_model_0.pt
+model/image_best_model.pth
+model/text_best_model.pt
