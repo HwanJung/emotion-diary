@@ -25,7 +25,7 @@ CREATE TABLE sns_accounts (
 CREATE INDEX idx_sns_accounts__user_id ON sns_accounts(user_id);
 
 CREATE TABLE diaries (
-    id         BIGSERIAL PRIMARY KEY,
+    id         BIGSERIAL    PRIMARY KEY,
     user_id    BIGINT       NOT NULL,
     title      VARCHAR(100) NOT NULL,
     content    TEXT         NOT NULL,
@@ -41,3 +41,22 @@ CREATE TABLE diaries (
 );
 
 CREATE INDEX idx_diaries__user_id_diary_date ON diaries (user_id, diary_date DESC);
+
+CREATE TABLE emotion_analysis (
+    id	            BIGSERIAL	PRIMARY KEY,
+    diary_id        BIGINT      NOT NULL,
+    emotion	        VARCHAR(20),
+    color	        VARCHAR(16),
+    status	        VARCHAR(16)	NOT NULL DEFAULT 'PENDING',
+    requested_at    TIMESTAMP   NOT NULL DEFAULT now(),
+    analyzed_at	    TIMESTAMP,
+
+    CONSTRAINT fk_emotion_analysis__diaries
+        FOREIGN KEY (diary_id) REFERENCES diaries (id)
+            ON DELETE CASCADE,
+
+    CONSTRAINT uq_emotion_analysis__diary_id
+        UNIQUE (diary_id)
+)
+
+CREATE INDEX idx_emotion_analysis__diary_id ON emotion_analysis (diary_id);
