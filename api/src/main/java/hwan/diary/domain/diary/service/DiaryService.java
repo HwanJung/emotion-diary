@@ -2,51 +2,76 @@ package hwan.diary.domain.diary.service;
 
 import hwan.diary.common.exception.ErrorCode;
 import hwan.diary.common.exception.diary.DiaryNotFoundException;
+import hwan.diary.domain.aws.service.S3Service;
+import hwan.diary.domain.diary.client.analysis.EmotionAnalysisClient;
+import hwan.diary.domain.diary.client.dto.AnalysisRequest;
+import hwan.diary.domain.diary.client.dto.AnalysisResponse;
 import hwan.diary.domain.diary.dto.DiaryDto;
+import hwan.diary.domain.diary.dto.DiaryWithEmotionDto;
 import hwan.diary.domain.diary.dto.command.CreateDiaryCommand;
 import hwan.diary.domain.diary.dto.command.UpdateDiaryCommand;
 import hwan.diary.domain.diary.dto.response.SliceResponse;
 import hwan.diary.domain.diary.entity.Diary;
+import hwan.diary.domain.diary.entity.EmotionAnalysis;
+import hwan.diary.domain.diary.enums.AnalysisStatus;
 import hwan.diary.domain.diary.repository.DiaryRepository;
+import hwan.diary.domain.diary.repository.EmotionAnalysisRepository;
 import hwan.diary.domain.diary.util.DiaryMapper;
 import hwan.diary.domain.user.entity.User;
 import hwan.diary.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientResponseException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DiaryService {
 
     private final DiaryRepository diaryRepository;
-    private final UserRepository userRepository;
+    private final S3Service s3Service;
+    private final EmotionAnalysisClient emotionAnalysisClient;
+    private final CreateDiaryTxService createDiaryTxService;
 
     /**
      * Create a new {@link Diary} for the given user and save to DB.
+     * Request an emotion analysis to an analysis server.
+     * Then, save the result receiving from the server.
      *
      * @param createDiaryCommand command containing title, content, optional imageKey, and date
      * @param userId the id of owner
      * @return a {@link DiaryDto} containing a diary info
      */
-    @Transactional
     public DiaryDto createDiary(CreateDiaryCommand createDiaryCommand, Long userId) {
-        User userRef = userRepository.getReferenceById(userId);
+        Diary savedDiary = createDiaryTxService.createDiaryTx(createDiaryCommand, userId);
 
-        Diary diary = Diary.create(
-            userRef,
-            createDiaryCommand.title(),
-            createDiaryCommand.content(),
-            createDiaryCommand.imageKey(),
-            createDiaryCommand.diaryDate()
+        try {
+            log.info("Request to analysis server diaryId={}", savedDiary.getId());
+            AnalysisResponse response = callAnalysisApi(savedDiary);
+            createDiaryTxService.markDoneTx(savedDiary.getId(), response.emotion(), response.colorCode());
+        } catch (ResourceAccessException e) {
+            log.error("Emotion analysis server connection failed or timeout diaryId={}", savedDiary.getId(), e);
+            createDiaryTxService.markFailedTx(savedDiary.getId());
+        }
+
+        return DiaryMapper.toDiaryDto(savedDiary);
+    }
+
+    private AnalysisResponse callAnalysisApi(Diary savedDiary) {
+        String presignedUrl = null;
+        if (savedDiary.getImageKey() != null) {
+            presignedUrl = s3Service.createGetPresignedUrl(savedDiary.getImageKey());
+        }
+
+        return emotionAnalysisClient.postAnalysisRequest(
+            new AnalysisRequest(savedDiary.getContent(), presignedUrl)
         );
-
-        diaryRepository.save(diary);
-
-        return DiaryMapper.toDiaryDto(diary);
     }
 
     /**

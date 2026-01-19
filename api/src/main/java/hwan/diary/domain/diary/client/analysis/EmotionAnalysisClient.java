@@ -12,7 +12,7 @@ public class EmotionAnalysisClient {
 
     private final RestClient emotionAnalysisRestClient;
 
-    public AnalysisResponse getAnalysisResult(AnalysisRequest request) {
+    public AnalysisResponse postAnalysisRequest(AnalysisRequest request) {
         return emotionAnalysisRestClient.post()
             .uri("/analyze-diary-fusion")
             .body(request)
