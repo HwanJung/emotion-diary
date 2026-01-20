@@ -49,6 +49,8 @@ services:
     image: ghcr.io/hwanjung/emotion-analysis-server:latest
     container_name: analysis-server
     restart: unless-stopped
+    networks:
+      - appnet
 
 networks:
   appnet:

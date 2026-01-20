@@ -120,6 +120,10 @@ async def analyze_diary_entry(diary_input: DiaryInput):
     emotion, color_code = predict_emotion(diary_input.text, diary_input.image_url)
     return AnalysisOutput(emotion=emotion, color_code=color_code)
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
 @app.get("/")
 def read_root():
     return {"message": "일기 감정 분석 AI 서버 (Fusion Model - Image Optional)"}

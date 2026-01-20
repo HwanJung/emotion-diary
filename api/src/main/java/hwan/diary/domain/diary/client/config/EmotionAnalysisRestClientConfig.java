@@ -17,11 +17,11 @@ public class EmotionAnalysisRestClientConfig {
     @Bean
     public RestClient emotionanalysisRestClient(RestClient.Builder builder, @Value("${analysis-server-url}") String url) {
         HttpClient httpClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(2))
+            .connectTimeout(Duration.ofSeconds(10))
             .build();
 
         JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
-        requestFactory.setReadTimeout(Duration.ofSeconds(3));
+        requestFactory.setReadTimeout(Duration.ofSeconds(10));
 
         return builder.baseUrl(url)
             .requestFactory(requestFactory)

@@ -51,8 +51,15 @@ public class DiaryService {
             log.info("Request to analysis server diaryId={}", savedDiary.getId());
             AnalysisResponse response = callAnalysisApi(savedDiary);
             createDiaryTxService.markDoneTx(savedDiary.getId(), response.emotion(), response.colorCode());
-        } catch (ResourceAccessException | RestClientResponseException e) {
-            log.error("Emotion analysis server connection failed or timeout diaryId={}", savedDiary.getId(), e);
+        } catch (ResourceAccessException e) {
+            log.error("[ANALYSIS_SERVER][NETWORK] connection failed/timeout diaryId={} msg={}",
+                savedDiary.getId(), e.getMessage(), e);
+
+            createDiaryTxService.markFailedTx(savedDiary.getId());
+        } catch (RestClientResponseException e) {
+            log.error("[ANALYSIS_SERVER][HTTP_ERROR] diaryId={} status={} body={}",
+                savedDiary.getId(), e.getRawStatusCode(), e.getResponseBodyAsString(), e);
+
             createDiaryTxService.markFailedTx(savedDiary.getId());
         }
 
