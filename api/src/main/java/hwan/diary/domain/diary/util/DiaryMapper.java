@@ -15,16 +15,4 @@ public class DiaryMapper {
             diary.getDiaryDate()
         );
     }
-
-    public static DiaryWithEmotionDto toDiaryWithEmotionDto(Diary diary, AnalysisResponse analysisResponse) {
-        return new DiaryWithEmotionDto(
-            diary.getId(),
-            diary.getTitle(),
-            diary.getContent(),
-            diary.getImageKey(),
-            diary.getDiaryDate(),
-            analysisResponse.emotion(),
-            analysisResponse.colorCode()
-        );
-    }
 }

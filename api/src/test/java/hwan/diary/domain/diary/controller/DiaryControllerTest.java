@@ -4,10 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hwan.diary.common.exception.ErrorCode;
 import hwan.diary.common.exception.diary.DiaryNotFoundException;
 import hwan.diary.domain.diary.dto.DiaryDto;
+import hwan.diary.domain.diary.dto.DiaryWithEmotionDto;
 import hwan.diary.domain.diary.dto.command.CreateDiaryCommand;
 import hwan.diary.domain.diary.dto.command.UpdateDiaryCommand;
 import hwan.diary.domain.diary.dto.request.CreateDiaryRequest;
 import hwan.diary.domain.diary.dto.request.UpdateDiaryRequest;
+import hwan.diary.domain.diary.enums.AnalysisStatus;
+import hwan.diary.domain.diary.enums.Emotion;
 import hwan.diary.domain.diary.service.DiaryService;
 import hwan.diary.security.jwt.principal.JwtAuthenticationToken;
 import hwan.diary.security.jwt.principal.JwtUserPrincipal;
@@ -60,15 +63,17 @@ public class DiaryControllerTest {
     private static final String CONTENT = "contentEx";
     private static final String IMAGE_KEY = "imageKeyEx";
     private static final LocalDate DIARY_DATE = LocalDate.of(2025, 9, 1);
+    private static final AnalysisStatus ANALYSIS_STATUS = AnalysisStatus.DONE;
+    private static final Emotion EMOTION = Emotion.JOY;
 
     private static Principal principal = new JwtAuthenticationToken(new JwtUserPrincipal(USER_ID));
 
     @Test
     void getDiary_returns200_andBody() throws Exception {
         // given
-        DiaryDto diaryDto = new DiaryDto(DIARY_ID, TITLE, CONTENT, IMAGE_KEY, DIARY_DATE);
+        DiaryWithEmotionDto diaryWithEmotionDto = new DiaryWithEmotionDto(DIARY_ID, TITLE, CONTENT, IMAGE_KEY, DIARY_DATE, ANALYSIS_STATUS, EMOTION, EMOTION.getColorCode());
 
-        given(diaryService.findDiary(DIARY_ID, USER_ID)).willReturn(diaryDto);
+        given(diaryService.findDiaryWithEmotion(DIARY_ID, USER_ID)).willReturn(diaryWithEmotionDto);
 
         // when & then
         mvc.perform(get("/api/diaries/{id}", DIARY_ID)
@@ -80,17 +85,17 @@ public class DiaryControllerTest {
             .andExpect(jsonPath("$.imageKey").value(IMAGE_KEY))
             .andExpect(jsonPath("$.diaryDate").value(DIARY_DATE.toString()));
 
-        verify(diaryService).findDiary(DIARY_ID, USER_ID);
+        verify(diaryService).findDiaryWithEmotion(DIARY_ID, USER_ID);
     }
 
     @Test
     void createDiary_return201_andBody() throws Exception {
         // given
         CreateDiaryRequest request = new CreateDiaryRequest(TITLE, CONTENT, IMAGE_KEY, DIARY_DATE);
-        DiaryDto createdDiaryDto = new DiaryDto(DIARY_ID, TITLE, CONTENT, IMAGE_KEY, DIARY_DATE);
+        DiaryWithEmotionDto diaryWithEmotionDto = new DiaryWithEmotionDto(DIARY_ID, TITLE, CONTENT, IMAGE_KEY, DIARY_DATE, ANALYSIS_STATUS, EMOTION, EMOTION.getColorCode());
 
         given(diaryService.createDiary(any(CreateDiaryCommand.class), eq(USER_ID)))
-            .willReturn(createdDiaryDto);
+            .willReturn(diaryWithEmotionDto);
 
         //when & then
         mvc.perform(post("/api/diaries")
@@ -118,10 +123,10 @@ public class DiaryControllerTest {
     void updateDiary_return200_andBody() throws Exception {
         // given
         UpdateDiaryRequest request = new UpdateDiaryRequest(TITLE, CONTENT, IMAGE_KEY, DIARY_DATE, true);
-        DiaryDto updated = new DiaryDto(DIARY_ID, TITLE, CONTENT, IMAGE_KEY, DIARY_DATE);
+        DiaryWithEmotionDto diaryWithEmotionDto = new DiaryWithEmotionDto(DIARY_ID, TITLE, CONTENT, IMAGE_KEY, DIARY_DATE, ANALYSIS_STATUS, EMOTION, EMOTION.getColorCode());
 
         given(diaryService.updateDiary(eq(USER_ID), eq(DIARY_ID), any(UpdateDiaryCommand.class)))
-            .willReturn(updated);
+            .willReturn(diaryWithEmotionDto);
 
         // when & then
         mvc.perform(put("/api/diaries/{id}", DIARY_ID)

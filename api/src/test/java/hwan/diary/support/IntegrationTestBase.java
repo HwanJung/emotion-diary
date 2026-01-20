@@ -17,7 +17,6 @@ import org.testcontainers.utility.DockerImageName;
 @ExtendWith(SpringExtension.class)
 public abstract class IntegrationTestBase {
 
-    // Use static so that each test class reuses the same containers (faster)
     @Container
     @ServiceConnection // wires spring.datasource.* automatically
     protected static final PostgreSQLContainer<?> POSTGRES =
@@ -28,6 +27,4 @@ public abstract class IntegrationTestBase {
     protected static final RedisContainer REDIS =
         new RedisContainer(RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG));
 
-    // Tip: If you want local reuse between runs (NOT recommended on CI):
-    // static { POSTGRES.withReuse(true); REDIS.withReuse(true); }
 }

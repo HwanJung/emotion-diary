@@ -1,5 +1,6 @@
 package hwan.diary.domain.diary.repository;
 
+import hwan.diary.domain.diary.dto.DiaryWithEmotionDto;
 import hwan.diary.domain.diary.entity.Diary;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +22,23 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
     Slice<Diary> findSliceByUserId(@Param("userId") Long userId, Pageable pageable);
 
     Optional<Diary> findByIdAndUserIdAndDeletedFalse(Long id, Long userId);
+
+    @Query("""
+        select new hwan.diary.domain.diary.dto.DiaryWithEmotionDto(
+            d.id,
+            d.title,
+            d.content,
+            d.imageKey,
+            d.diaryDate,
+            e.status,
+            e.emotion,
+            e.colorCode
+        )
+        from Diary d join EmotionAnalysis e on e.diary.id = d.id
+        where d.user.id = :userId
+            and d.id = :diaryId
+            and d.deleted = false
+    """)
+    Optional<DiaryWithEmotionDto> findDiaryWithEmotionById(@Param("userId") Long userId,
+                                                           @Param("diaryId") Long diaryId);
 }

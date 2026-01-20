@@ -1,6 +1,7 @@
 package hwan.diary.domain.diary.controller;
 
 import hwan.diary.domain.diary.dto.DiaryDto;
+import hwan.diary.domain.diary.dto.DiaryWithEmotionDto;
 import hwan.diary.domain.diary.dto.command.CreateDiaryCommand;
 import hwan.diary.domain.diary.dto.command.UpdateDiaryCommand;
 import hwan.diary.domain.diary.dto.request.CreateDiaryRequest;
@@ -38,17 +39,17 @@ public class DiaryController {
     }
 
     @GetMapping("/{id}")
-    public DiaryDto getDiary(
+    public DiaryWithEmotionDto getDiary(
         @PathVariable("id") Long id,
         Principal principal
     ) {
         Long userId = Long.parseLong(principal.getName());
 
-        return diaryService.findDiary(id, userId);
+        return diaryService.findDiaryWithEmotion(id, userId);
     }
 
     @PostMapping
-    public ResponseEntity<DiaryDto> createDiary(
+    public ResponseEntity<DiaryWithEmotionDto> createDiary(
         Principal principal,
         @Valid @RequestBody CreateDiaryRequest request
     ) {
@@ -56,7 +57,7 @@ public class DiaryController {
 
         CreateDiaryCommand cmd = CreateDiaryCommand.from(request);
 
-        DiaryDto created = diaryService.createDiary(cmd, userId);
+        DiaryWithEmotionDto created = diaryService.createDiary(cmd, userId);
         URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path("/{id}")
@@ -67,7 +68,7 @@ public class DiaryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DiaryDto> updateDiary(
+    public ResponseEntity<DiaryWithEmotionDto> updateDiary(
         Principal principal,
         @PathVariable("id") Long id,
         @Valid @RequestBody UpdateDiaryRequest request
@@ -75,7 +76,7 @@ public class DiaryController {
         Long userId = Long.parseLong(principal.getName());
 
         UpdateDiaryCommand cmd = UpdateDiaryCommand.of(request);
-        DiaryDto updatedDiary = diaryService.updateDiary(userId, id, cmd);
+        DiaryWithEmotionDto updatedDiary = diaryService.updateDiary(userId, id, cmd);
 
         return ResponseEntity.ok().body(updatedDiary);
     }

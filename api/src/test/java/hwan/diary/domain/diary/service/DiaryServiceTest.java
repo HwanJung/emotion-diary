@@ -2,6 +2,7 @@ package hwan.diary.domain.diary.service;
 
 import hwan.diary.common.exception.diary.DiaryNotFoundException;
 import hwan.diary.domain.diary.dto.DiaryDto;
+import hwan.diary.domain.diary.dto.DiaryWithEmotionDto;
 import hwan.diary.domain.diary.dto.command.CreateDiaryCommand;
 import hwan.diary.domain.diary.dto.command.UpdateDiaryCommand;
 import hwan.diary.domain.diary.dto.response.SliceResponse;
@@ -77,40 +78,40 @@ public class DiaryServiceTest {
         );
 
         // when
-        DiaryDto diaryDto = diaryService.createDiary(createDiaryCommand, USER_ID);
+        DiaryWithEmotionDto diaryWithEmotionDto = diaryService.createDiary(createDiaryCommand, USER_ID);
 
         // then
-        assertEquals(TITLE, diaryDto.title());
-        assertEquals(CONTENT, diaryDto.content());
-        assertEquals(IMAGE_KEY, diaryDto.imageKey());
-        assertEquals(DIARY_DATE, diaryDto.diaryDate());
+        assertEquals(TITLE, diaryWithEmotionDto.title());
+        assertEquals(CONTENT, diaryWithEmotionDto.content());
+        assertEquals(IMAGE_KEY, diaryWithEmotionDto.imageKey());
+        assertEquals(DIARY_DATE, diaryWithEmotionDto.diaryDate());
 
         verify(diaryRepository, times(1)).save(any(Diary.class));
     }
 
     @Test
-    void findDiary_whenExists_thenReturnDto(){
+    void findDiary_WithEmotion_whenExists_thenReturnDto(){
         // given
         given(diaryRepository.findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID)).willReturn(Optional.of(existingDiary));
 
         // when
-        DiaryDto diaryDto = diaryService.findDiary(DIARY_ID, USER_ID);
+        DiaryWithEmotionDto diaryWithEmotionDto = diaryService.findDiaryWithEmotion(DIARY_ID, USER_ID);
 
         // then
-        assertEquals(OLD_TITLE, diaryDto.title());
-        assertEquals(OLD_CONTENT, diaryDto.content());
-        assertEquals(OLD_IMAGE, diaryDto.imageKey());
-        assertEquals(OLD_DATE, diaryDto.diaryDate());
+        assertEquals(OLD_TITLE, diaryWithEmotionDto.title());
+        assertEquals(OLD_CONTENT, diaryWithEmotionDto.content());
+        assertEquals(OLD_IMAGE, diaryWithEmotionDto.imageKey());
+        assertEquals(OLD_DATE, diaryWithEmotionDto.diaryDate());
         verify(diaryRepository, times(1)).findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID);
     }
 
     @Test
-    void findDiary_whenNotExists_thenThrowsException(){
+    void findDiary_WithEmotion_whenNotExists_thenThrowsException(){
         // given
         given(diaryRepository.findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID)).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(DiaryNotFoundException.class, () -> diaryService.findDiary(DIARY_ID, USER_ID));
+        assertThrows(DiaryNotFoundException.class, () -> diaryService.findDiaryWithEmotion(DIARY_ID, USER_ID));
         verify(diaryRepository, times(1)).findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID);
     }
 
@@ -173,15 +174,15 @@ public class DiaryServiceTest {
         UpdateDiaryCommand cmd = new UpdateDiaryCommand("new title", "new content", newDate, null, true);
 
         // when
-        DiaryDto dto = diaryService.updateDiary(USER_ID, DIARY_ID, cmd);
+        DiaryWithEmotionDto dto = diaryService.updateDiary(USER_ID, DIARY_ID, cmd);
 
         // then
         assertEquals(DIARY_ID, dto.id());
         assertEquals("new title", dto.title());
         assertEquals("new content", dto.content());
         assertEquals(newDate, dto.diaryDate());
-        assertNull(dto.imageKey());                         // 이미지 제거 확인
-        assertNull(existingDiary.getImageKey());            // 엔티티 상태도 변경됨
+        assertNull(dto.imageKey());
+        assertNull(existingDiary.getImageKey());
 
         verify(diaryRepository, times(1)).findByIdAndUserIdAndDeletedFalse(DIARY_ID, USER_ID);
         verifyNoMoreInteractions(diaryRepository);
@@ -196,7 +197,7 @@ public class DiaryServiceTest {
         UpdateDiaryCommand cmd = new UpdateDiaryCommand("t2", "c2", newDate, "img/new.png", false);
 
         // when
-        DiaryDto dto = diaryService.updateDiary(USER_ID, DIARY_ID, cmd);
+        DiaryWithEmotionDto dto = diaryService.updateDiary(USER_ID, DIARY_ID, cmd);
 
         // then
         assertEquals("img/new.png", dto.imageKey());
@@ -218,7 +219,7 @@ public class DiaryServiceTest {
         UpdateDiaryCommand cmd = new UpdateDiaryCommand("t3", "c3", newDate, null, false);
 
         // when
-        DiaryDto dto = diaryService.updateDiary(USER_ID, DIARY_ID, cmd);
+        DiaryWithEmotionDto dto = diaryService.updateDiary(USER_ID, DIARY_ID, cmd);
 
         // then
         assertEquals(OLD_IMAGE, dto.imageKey());            // 유지
@@ -240,7 +241,7 @@ public class DiaryServiceTest {
         UpdateDiaryCommand cmd = new UpdateDiaryCommand("t4", "c4", newDate, OLD_IMAGE, false);
 
         // when
-        DiaryDto dto = diaryService.updateDiary(USER_ID, DIARY_ID, cmd);
+        DiaryWithEmotionDto dto = diaryService.updateDiary(USER_ID, DIARY_ID, cmd);
 
         // then
         assertEquals(OLD_IMAGE, dto.imageKey());            // 변경 없음

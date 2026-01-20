@@ -1,48 +1,33 @@
 services:
-  postgres:
-    image: postgres:17
-    container_name: postgres
+  db:
+    image: postgres:16-alpine
+    container_name: db
     env_file:
       - .env.local
+    restart: unless-stopped
     environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Seoul
       POSTGRES_INITDB_ARGS: "--lc-messages=C --encoding=UTF8"
     ports:
       - "5433:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}" ]
-      interval: 5s
-      timeout: 3s
-      retries: 20
-      start_period: 10s
-    restart: unless-stopped
+      - postgres_data:/var/lib/postgresql/data
 
   redis:
     image: redis:7-alpine
     container_name: redis
-    ports:
-      - "6379:6379"
     env_file:
       - .env.local
-    command: >
-      sh -c "redis-server
-             --appendonly yes                  
-             --save 60 1000
-             --protected-mode yes
-             --requirepass ${REDIS_PASSWORD}"
+    restart: unless-stopped
+    command: [ "redis-server", "--appendonly", "yes" ]
+    ports:
+      - "6379:6379"
     volumes:
       - redis_data:/data
-    healthcheck:
-      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping" ]
-      interval: 5s
-      timeout: 3s
-      retries: 20
-      start_period: 5s
-    restart: unless-stopped
 
 volumes:
-  pgdata:
-    name: pgdata
   redis_data:
-    name: redis_data
+  postgres_data:

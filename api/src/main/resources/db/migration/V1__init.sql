@@ -46,9 +46,9 @@ CREATE TABLE emotion_analysis (
     id	            BIGSERIAL	PRIMARY KEY,
     diary_id        BIGINT      NOT NULL,
     emotion	        VARCHAR(20),
-    color	        VARCHAR(16),
+    color_code      VARCHAR(16),
     status	        VARCHAR(16)	NOT NULL DEFAULT 'PENDING',
-    requested_at    TIMESTAMP   NOT NULL DEFAULT now(),
+    created_at    TIMESTAMP   NOT NULL DEFAULT now(),
     analyzed_at	    TIMESTAMP,
 
     CONSTRAINT fk_emotion_analysis__diaries
@@ -57,6 +57,6 @@ CREATE TABLE emotion_analysis (
 
     CONSTRAINT uq_emotion_analysis__diary_id
         UNIQUE (diary_id)
-)
+);
 
 CREATE INDEX idx_emotion_analysis__diary_id ON emotion_analysis (diary_id);

@@ -1,5 +1,8 @@
 package hwan.diary.domain.diary.dto;
 
+import hwan.diary.domain.diary.enums.AnalysisStatus;
+import hwan.diary.domain.diary.enums.Emotion;
+
 import java.time.LocalDate;
 
 public record DiaryWithEmotionDto(
@@ -8,7 +11,8 @@ public record DiaryWithEmotionDto(
     String content,
     String imageKey,
     LocalDate diaryDate,
-    String emotion,
+    AnalysisStatus analysisStatus,
+    Emotion emotion,
     String colorCode
 ) {
 }

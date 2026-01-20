@@ -24,6 +24,7 @@ public class EmotionAnalysisRestClientConfig {
         requestFactory.setReadTimeout(Duration.ofSeconds(3));
 
         return builder.baseUrl(url)
+            .requestFactory(requestFactory)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .build();
     }

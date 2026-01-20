@@ -1,6 +1,7 @@
 package hwan.diary.domain.diary.entity;
 
 import hwan.diary.domain.diary.enums.AnalysisStatus;
+import hwan.diary.domain.diary.enums.Emotion;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -31,8 +32,9 @@ public class EmotionAnalysis {
     )
     private Diary diary;
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    private String emotion;
+    private Emotion emotion;
 
     @Column(length = 16)
     private String colorCode;
@@ -56,7 +58,7 @@ public class EmotionAnalysis {
         return ea;
     }
 
-    public EmotionAnalysis update(String emotion, String colorCode) {
+    public EmotionAnalysis update(Emotion emotion, String colorCode) {
         this.emotion = emotion;
         this.colorCode = colorCode;
         analyzedAt = LocalDateTime.now();

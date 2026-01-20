@@ -12,13 +12,8 @@ import hwan.diary.domain.diary.dto.command.CreateDiaryCommand;
 import hwan.diary.domain.diary.dto.command.UpdateDiaryCommand;
 import hwan.diary.domain.diary.dto.response.SliceResponse;
 import hwan.diary.domain.diary.entity.Diary;
-import hwan.diary.domain.diary.entity.EmotionAnalysis;
-import hwan.diary.domain.diary.enums.AnalysisStatus;
 import hwan.diary.domain.diary.repository.DiaryRepository;
-import hwan.diary.domain.diary.repository.EmotionAnalysisRepository;
 import hwan.diary.domain.diary.util.DiaryMapper;
-import hwan.diary.domain.user.entity.User;
-import hwan.diary.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +22,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
 @Slf4j
@@ -46,21 +42,22 @@ public class DiaryService {
      *
      * @param createDiaryCommand command containing title, content, optional imageKey, and date
      * @param userId the id of owner
-     * @return a {@link DiaryDto} containing a diary info
+     * @return a {@link DiaryWithEmotionDto} containing a diary info
      */
-    public DiaryDto createDiary(CreateDiaryCommand createDiaryCommand, Long userId) {
+    public DiaryWithEmotionDto createDiary(CreateDiaryCommand createDiaryCommand, Long userId) {
         Diary savedDiary = createDiaryTxService.createDiaryTx(createDiaryCommand, userId);
 
         try {
             log.info("Request to analysis server diaryId={}", savedDiary.getId());
             AnalysisResponse response = callAnalysisApi(savedDiary);
             createDiaryTxService.markDoneTx(savedDiary.getId(), response.emotion(), response.colorCode());
-        } catch (ResourceAccessException e) {
+        } catch (ResourceAccessException | RestClientResponseException e) {
             log.error("Emotion analysis server connection failed or timeout diaryId={}", savedDiary.getId(), e);
             createDiaryTxService.markFailedTx(savedDiary.getId());
         }
 
-        return DiaryMapper.toDiaryDto(savedDiary);
+        return diaryRepository.findDiaryWithEmotionById(userId, savedDiary.getId())
+            .orElseThrow(() -> new DiaryNotFoundException(ErrorCode.DIARY_NOT_FOUND, savedDiary.getId(), userId));
     }
 
     private AnalysisResponse callAnalysisApi(Diary savedDiary) {
@@ -82,10 +79,9 @@ public class DiaryService {
      * @return Diary DTO containing a diary info {@link DiaryDto}
      */
     @Transactional(readOnly = true)
-    public DiaryDto findDiary(Long id, Long userId) {
-        Diary diary = findDiaryByIdAndUserIdInternal(id, userId);
-
-        return DiaryMapper.toDiaryDto(diary);
+    public DiaryWithEmotionDto findDiaryWithEmotion(Long id, Long userId) {
+        return diaryRepository.findDiaryWithEmotionById(userId, id)
+            .orElseThrow(() -> new DiaryNotFoundException(ErrorCode.DIARY_NOT_FOUND, id, userId));
     }
 
     /**
@@ -115,7 +111,7 @@ public class DiaryService {
      * @return {@link DiaryDto} containing a diary info
      */
     @Transactional
-    public DiaryDto updateDiary(Long userId, Long id, UpdateDiaryCommand cmd) {
+    public DiaryWithEmotionDto updateDiary(Long userId, Long id, UpdateDiaryCommand cmd) {
         Diary diary = findDiaryByIdAndUserIdInternal(id, userId);
 
         if(cmd.clearImage()){
@@ -127,7 +123,8 @@ public class DiaryService {
 
         diary.update(cmd.title(), cmd.content(), cmd.diaryDate());
 
-        return DiaryMapper.toDiaryDto(diary);
+        return diaryRepository.findDiaryWithEmotionById(userId, id)
+            .orElseThrow(() -> new DiaryNotFoundException(ErrorCode.DIARY_NOT_FOUND, id, userId));
     }
 
     /**

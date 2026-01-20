@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum EmotionColor {
+public enum Emotion {
     JOY("#FFD700"),
     SADNESS("#4682B4"),
     SURPRISE("#9370DB"),
