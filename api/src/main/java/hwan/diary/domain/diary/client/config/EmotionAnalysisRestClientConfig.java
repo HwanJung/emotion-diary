@@ -15,7 +15,7 @@ import java.time.Duration;
 public class EmotionAnalysisRestClientConfig {
 
     @Bean
-    public RestClient emotionanalysisRestClient(RestClient.Builder builder, @Value("${analysis-server-url}") String url) {
+    public RestClient emotionAnalysisRestClient(RestClient.Builder builder, @Value("${analysis-server-url}") String url) {
         HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
             .build();
