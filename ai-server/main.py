@@ -1,7 +1,7 @@
 # main.py (image_url 선택 사항으로 최종 수정)
 
 import torch
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from transformers import BertTokenizer
 from torchvision import transforms
@@ -10,6 +10,7 @@ from PIL import Image
 from io import BytesIO
 # [수정] Optional 타입을 가져옵니다.
 from typing import Optional
+import logging
 
 from models.fusion_model import EmotionClassifier, get_vit_model, FusionMLP
 
@@ -68,6 +69,7 @@ image_transform = transforms.Compose([
 
 # --- FastAPI 앱 설정 ---
 app = FastAPI()
+logger = logging.getLogger("uvicorn.error")
 
 # [수정] DiaryInput 모델에서 image_url을 선택 사항으로 변경합니다.
 class DiaryInput(BaseModel):
@@ -114,6 +116,17 @@ def predict_emotion(text: str, image_url: Optional[str] = None):
     emotion = EMOTION_LABELS[pred_index]
     color = EMOTION_COLORS.get(emotion, "#FFFFFF")
     return emotion, color
+
+@app.middleware("http")
+async def log_raw_body(request: Request, call_next):
+    # analyze-diary-fusion 요청만 로깅
+    if request.url.path == "/analyze-diary-fusion":
+        raw_body = await request.body()
+        logger.info("[RAW][%s %s] headers=%s", request.method, request.url.path, dict(request.headers))
+        logger.info("[RAW][%s %s] body=%s", request.method, request.url.path, raw_body)
+
+    response = await call_next(request)
+    return response
 
 @app.post("/analyze-diary-fusion", response_model=AnalysisOutput)
 async def analyze_diary_entry(diary_input: DiaryInput):
