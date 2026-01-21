@@ -6,7 +6,7 @@
         format json
     }
 }
-3.36.70.16.nip.io {
+3.39.231.176.nip.io {
     encode zstd gzip
 
     @http protocol http

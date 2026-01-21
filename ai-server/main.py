@@ -11,14 +11,14 @@ from io import BytesIO
 # [수정] Optional 타입을 가져옵니다.
 from typing import Optional
 
-from model.fusion_model import EmotionClassifier, get_vit_model, FusionMLP
+from models.fusion_model import EmotionClassifier, get_vit_model, FusionMLP
 
 # --- 최종 확정된 정보 ---
 TOKENIZER_NAME = "bert-base-multilingual-cased"
 EMOTION_LABELS = ['Joy', 'Sadness', 'Surprise', 'Anger', 'Fear', 'Disgust', 'Neutral']
-TEXT_MODEL_PATH = './model/text_best_model.pt'
-IMAGE_MODEL_PATH = './model/image_best_model.pth'
-FUSION_MODEL_PATH = './model/fusion_head_model_0.pt'
+TEXT_MODEL_PATH = 'model_params/text_best_model.pt'
+IMAGE_MODEL_PATH = 'model_params/image_best_model.pth'
+FUSION_MODEL_PATH = 'model_params/fusion_head_model_0.pt'
 
 EMOTION_COLORS = {
     'Joy': '#FFD700', 'Sadness': '#4682B4', 'Surprise': '#9370DB',

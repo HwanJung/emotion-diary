@@ -49,6 +49,9 @@ services:
     image: ghcr.io/hwanjung/emotion-analysis-server:latest
     container_name: analysis-server
     restart: unless-stopped
+    volumes:
+      - /home/ubuntu/emotion-diary/model-params:/app/model_params
+    mem_limit: 900m
     networks:
       - appnet
 

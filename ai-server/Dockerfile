@@ -12,9 +12,9 @@ COPY requirements.txt .
 # 4. 라이브러리 설치
 # --no-cache-dir은 불필요한 캐시를 남기지 않아 이미지 크기를 줄여줍니다.
 RUN python -m pip install --no-cache-dir --upgrade pip \
- && python -m pip install --no-cachir \
-    --index-url https://download.pytorch.org/whl/cpu \
+ && python -m pip install --no-cache-dir \
     torch==2.2.2 torchvision==0.17.2 \
+    --extra-index-url https://download.pytorch.org/whl/cpu \
  && python -m pip install --no-cache-dir -r requirements.txt
 
 # 5. 프로젝트의 모든 파일(main.py, model/ 폴더 등)을 컨테이너 안으로 복사
