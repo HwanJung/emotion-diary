@@ -21,7 +21,7 @@ API 서버, AI 분석 서버, 프론트엔드, 리버스 프록시를 하나의 
 
 ## 🧱 Architecture
 
-<img src="docs/emtion-diary-architecture.png" width="800"/>
+<img src="docs/emotion-diary-architecture.png" width="800"/>
 
 
 
@@ -62,13 +62,4 @@ API 서버, AI 분석 서버, 프론트엔드, 리버스 프록시를 하나의 
 - Backend services (API / AI / DB / Redis / Proxy) run on AWS EC2 using Docker Compose
 - Docker images are built and pushed to GitHub Container Registry (GHCR)
 
----
-
-## 📦 Repository Structure
-   .
-   ├── api/ # Spring Boot API Server
-   ├── ai-server/ # FastAPI Emotion Analysis Server
-   ├── web/ # Frontend
-   ├── reverse-proxy/ # Caddy configuration
-   └── docker-compose.yml
 
