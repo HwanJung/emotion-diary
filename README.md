@@ -21,19 +21,7 @@ API 서버, AI 분석 서버, 프론트엔드, 리버스 프록시를 하나의 
 
 ## 🧱 Architecture
 
-Browser
-   |
-   v
-Vercel (Frontend)
-   |
-   v
-Reverse Proxy (Caddy on EC2)
-   |
-   v
-API Server (Spring Boot) --> PostgreSQL / Redis
-   |
-   v
-AI Server (FastAPI)
+<img src="docs/emtion-diary-architecture.png" width="800"/>
 
 
 
@@ -77,10 +65,10 @@ AI Server (FastAPI)
 ---
 
 ## 📦 Repository Structure
-.
-├── api/ # Spring Boot API Server
-├── ai-server/ # FastAPI Emotion Analysis Server
-├── web/ # Frontend
-├── reverse-proxy/ # Caddy configuration
-└── docker-compose.yml
+   .
+   ├── api/ # Spring Boot API Server
+   ├── ai-server/ # FastAPI Emotion Analysis Server
+   ├── web/ # Frontend
+   ├── reverse-proxy/ # Caddy configuration
+   └── docker-compose.yml
 
