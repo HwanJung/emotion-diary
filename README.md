@@ -70,4 +70,4 @@ API 서버, AI 분석 서버, 프론트엔드, 리버스 프록시를 하나의 
 ## 🚧 Future Improvements
 - Emotion analysis 처리를 비동기화하기 위해 이벤트 기반 아키텍처 도입
 - AI 서버를 별도의 EC2 인스턴스로 분리해 독립적인 확장 구조 구성
-
+- CI/CD 도입
