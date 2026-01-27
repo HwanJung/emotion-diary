@@ -1,4 +1,6 @@
 # 📓 Emotion Diary (감정 일기장)
+사이트 주소
+https://diary-web-qyme.vercel.app
 
 Emotion Diary는 사용자가 일기를 작성하면 텍스트 기반 감정 분석을 수행하고,  
 결과를 저장·조회할 수 있는 **웹 기반 감정 기록 서비스**입니다.
@@ -59,8 +61,13 @@ API 서버, AI 분석 서버, 프론트엔드, 리버스 프록시를 하나의 
 
 ## 📌 Deployment
 
-- Frontend is deployed on Vercel
-- Backend services (API / AI / DB / Redis / Proxy) run on AWS EC2 using Docker Compose
-- Docker images are built and pushed to GitHub Container Registry (GHCR)
+- Frontend는 Vercel에서 배포
+- Backend services (API / AI / DB / Redis / Proxy)는 AWS EC2 에서 Docker Compose를 사용해 실행
+- Docker 이미지는 빌드된 후 GitHub Container Registry (GHCR)로 push
 
+---
+
+## 🚧 Future Improvements
+- Emotion analysis 처리를 비동기화하기 위해 이벤트 기반 아키텍처 도입
+- AI 서버를 별도의 EC2 인스턴스로 분리해 독립적인 확장 구조 구성
 
