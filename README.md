@@ -23,7 +23,7 @@ API 서버, AI 분석 서버, 프론트엔드, 리버스 프록시를 하나의 
 
 ## 🧱 Architecture
 
-<img src="docs/emotion-diary-architecture.png" width="800"/>
+<img src="docs/emotion-diary-architecture.png" width="600"/>
 
 
 
