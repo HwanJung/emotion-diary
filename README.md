@@ -44,6 +44,7 @@ API 서버, AI 분석 서버, 프론트엔드, 리버스 프록시를 하나의 
 - Spring Data JPA
 - PostgreSQL
 - Redis
+- S3
 
 ### AI Server
 - Python
