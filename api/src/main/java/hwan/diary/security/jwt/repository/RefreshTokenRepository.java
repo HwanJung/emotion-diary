@@ -12,19 +12,15 @@ public class RefreshTokenRepository {
 
     private final StringRedisTemplate stringRedisTemplate;
 
-    public void save(Long userId, String refreshToken) {
-        stringRedisTemplate.opsForValue().set(buildKey(userId), refreshToken, 7, TimeUnit.DAYS);
+    public void save(Long userId, String hashedToken) {
+        stringRedisTemplate.opsForValue().set(hashedToken, String.valueOf(userId), 7, TimeUnit.DAYS);
     }
 
-    public String get(Long userId) {
-        return stringRedisTemplate.opsForValue().get(buildKey(userId));
+    public String get(String hashedToken) {
+        return stringRedisTemplate.opsForValue().get(hashedToken);
     }
 
-    public void delete(Long userId) {
-        stringRedisTemplate.delete(buildKey(userId));
-    }
-
-    private String buildKey(Long userId) {
-        return "refresh:" + userId;
+    public void delete(String hashedToken) {
+        stringRedisTemplate.delete(hashedToken);
     }
 }
