@@ -116,6 +116,6 @@ class EmotionAnalysisClientHttpTest {
         JsonNode body = objectMapper.readTree(recorded.getBody().readUtf8());
 
         assertThat(body.get("text").asText()).isEqualTo("no image");
-        assertThat(body.has("image_url")).isFalse(); // ✅ null이어도 돼: 필드 없어도 OK
+        assertThat(body.has("image_url")).isFalse();
     }
 }

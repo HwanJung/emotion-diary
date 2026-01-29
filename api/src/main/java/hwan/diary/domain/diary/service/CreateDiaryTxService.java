@@ -4,6 +4,7 @@ import hwan.diary.domain.diary.dto.command.CreateDiaryCommand;
 import hwan.diary.domain.diary.entity.Diary;
 import hwan.diary.domain.diary.entity.EmotionAnalysis;
 import hwan.diary.domain.diary.enums.AnalysisStatus;
+import hwan.diary.domain.diary.enums.Emotion;
 import hwan.diary.domain.diary.repository.DiaryRepository;
 import hwan.diary.domain.diary.repository.EmotionAnalysisRepository;
 import hwan.diary.domain.user.entity.User;
@@ -39,7 +40,7 @@ public class CreateDiaryTxService {
     }
 
     @Transactional
-    public void markDoneTx(Long diaryId, String emotion, String colorCode) {
+    public void markDoneTx(Long diaryId, Emotion emotion, String colorCode) {
         emotionAnalysisRepository.updateAnalysisResult(diaryId, AnalysisStatus.DONE, emotion, colorCode);
     }
 

@@ -12,7 +12,8 @@ public enum Emotion {
     ANGER("#DC143C"),
     FEAR("#2F4F4F"),
     DISGUST("#556B2F"),
-    NEUTRAL("#D3D3D3");
+    NEUTRAL("#D3D3D3"),
+    UNKNOWN("#FFFFFF");
 
     private final String colorCode;
 }

@@ -12,6 +12,7 @@ import hwan.diary.domain.diary.dto.command.CreateDiaryCommand;
 import hwan.diary.domain.diary.dto.command.UpdateDiaryCommand;
 import hwan.diary.domain.diary.dto.response.SliceResponse;
 import hwan.diary.domain.diary.entity.Diary;
+import hwan.diary.domain.diary.enums.Emotion;
 import hwan.diary.domain.diary.repository.DiaryRepository;
 import hwan.diary.domain.diary.util.DiaryMapper;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,8 @@ public class DiaryService {
         try {
             log.info("Request to analysis server diaryId={}", savedDiary.getId());
             AnalysisResponse response = callAnalysisApi(savedDiary);
-            createDiaryTxService.markDoneTx(savedDiary.getId(), response.emotion(), response.colorCode());
+            Emotion emotion = normalizeEmotion(response.emotion());
+            createDiaryTxService.markDoneTx(savedDiary.getId(), emotion, response.colorCode());
         } catch (ResourceAccessException e) {
             log.error("[ANALYSIS_SERVER][NETWORK] connection failed/timeout diaryId={} msg={}",
                 savedDiary.getId(), e.getMessage(), e);
@@ -76,6 +78,15 @@ public class DiaryService {
         return emotionAnalysisClient.postAnalysisRequest(
             new AnalysisRequest(savedDiary.getContent(), presignedUrl)
         );
+    }
+
+    private Emotion normalizeEmotion(String raw) {
+        if (raw == null) return Emotion.UNKNOWN;
+        try {
+            return Emotion.valueOf(raw.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return Emotion.UNKNOWN;
+        }
     }
 
     /**

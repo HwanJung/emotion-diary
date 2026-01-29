@@ -18,6 +18,7 @@ public class EmotionAnalysisRestClientConfig {
     public RestClient emotionAnalysisRestClient(RestClient.Builder builder, @Value("${analysis-server-url}") String url) {
         HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
+            .version(HttpClient.Version.HTTP_1_1)
             .build();
 
         JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);

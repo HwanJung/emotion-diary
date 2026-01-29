@@ -2,6 +2,7 @@ package hwan.diary.domain.diary.repository;
 
 import hwan.diary.domain.diary.entity.EmotionAnalysis;
 import hwan.diary.domain.diary.enums.AnalysisStatus;
+import hwan.diary.domain.diary.enums.Emotion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,7 +22,7 @@ public interface EmotionAnalysisRepository extends JpaRepository<EmotionAnalysis
     """)
     int updateAnalysisResult(@Param("diaryId") Long diaryId,
                               @Param("status") AnalysisStatus status,
-                              @Param("emotion") String emotion,
+                              @Param("emotion") Emotion emotion,
                               @Param("colorCode") String colorCode);
 
     @Modifying
