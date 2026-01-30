@@ -4,15 +4,18 @@ import hwan.diary.common.exception.token.TokenExpiredException;
 import hwan.diary.common.exception.token.TokenInvalidException;
 import hwan.diary.common.exception.token.TokenMissingException;
 import hwan.diary.security.jwt.token.JwtProvider;
+import hwan.diary.security.jwt.token.TokenProperties;
 import hwan.diary.security.jwt.token.TokenType;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.shaded.org.yaml.snakeyaml.tokens.Token;
 
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class JwtProviderTest {
 
-    private final JwtProvider jwtProvider = new JwtProvider("12345678901234567890123456789012", 3600000, 36000000);
+    private final TokenProperties tokenProperties = new TokenProperties(3600000, 36000000);
+    private final JwtProvider jwtProvider = new JwtProvider("12345678901234567890123456789012", tokenProperties);
 
     @Test
     void parseClaims_whenMissingToken_thenThrowException() {
@@ -24,7 +27,8 @@ public class JwtProviderTest {
     @Test
     void parseClaims_whenExpiredToken_thenThrowException() throws InterruptedException {
         // given
-        JwtProvider shortLivedProvider = new JwtProvider("12345678901234567890123456789012", 1, 1);
+        TokenProperties tokenProperties = new TokenProperties(3600000, 36000000);
+        JwtProvider shortLivedProvider = new JwtProvider("12345678901234567890123456789012", tokenProperties);
 
         String accessToken = shortLivedProvider.generateToken(1L, TokenType.ACCESS);
         String refreshToken = shortLivedProvider.generateToken(1L, TokenType.REFRESH);

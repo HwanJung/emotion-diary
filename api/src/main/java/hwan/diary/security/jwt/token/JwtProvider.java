@@ -22,17 +22,14 @@ import java.util.Date;
 @Component
 public class JwtProvider {
 
-    private final long accessTokenExpirationMs;
-    private final long refreshTokenExpirationMs;
+    private final TokenProperties tokenProperties;
     private final SecretKey secretKey;
 
     public JwtProvider(@Value("${jwt.secret}") String secretBase64,
-                       @Value("${jwt.access-token-expiration-ms}") long accessTokenExpirationMs,
-                       @Value("${jwt.refresh-token-expiration-ms}") long refreshTokenExpirationMs
+                       TokenProperties tokenProperties
     ) {
         this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretBase64));
-        this.accessTokenExpirationMs = accessTokenExpirationMs;
-        this.refreshTokenExpirationMs = refreshTokenExpirationMs;
+        this.tokenProperties = tokenProperties;
     }
 
     /**
@@ -44,7 +41,8 @@ public class JwtProvider {
      */
     public String generateToken(Long userId, TokenType type) {
         String claimValue = type == TokenType.ACCESS ? "access" : "refresh";
-        long expirationMs = type == TokenType.ACCESS ? accessTokenExpirationMs : refreshTokenExpirationMs;
+        long expirationMs = type == TokenType.ACCESS
+            ? tokenProperties.getAccessTokenExpirationMs() : tokenProperties.getRefreshTokenExpirationMs();
 
         return Jwts.builder()
             .subject(userId.toString())
