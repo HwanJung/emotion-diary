@@ -188,6 +188,7 @@ public class AuthServiceTest {
         given(jwtProvider.getUserIdFromClaims(claims, TokenType.REFRESH)).willReturn(1L);
         given(refreshTokenRepository.get(1L)).willReturn("refresh_token");
 
+
         given(jwtProvider.generateToken(1L, TokenType.ACCESS)).willReturn("access_token");
         given(jwtProvider.generateToken(1L, TokenType.REFRESH)).willReturn("new_refresh_token");
 
@@ -197,7 +198,7 @@ public class AuthServiceTest {
         // then
         assertEquals("Bearer", tokenResponse.tokenType());
         assertEquals("access_token", tokenResponse.accessToken());
-        assertEquals("new_refresh_token", tokenResponse.refreshToken());
+        verify(refreshTokenRepository).save(1L, "new_refresh_token");
     }
 
     @Test
