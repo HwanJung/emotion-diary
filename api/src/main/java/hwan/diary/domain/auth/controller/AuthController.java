@@ -49,7 +49,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(Principal principal) {
         Long userId = Long.parseLong(principal.getName());
-        log.debug("[auth/logout] attempt email={}", principal.getName());
+        log.debug("[auth/logout] attempt userId={}", userId);
         authService.logout(userId);
         log.info("[auth/logout] success. userId={}", userId);
         return ResponseEntity.noContent().build();
@@ -62,9 +62,9 @@ public class AuthController {
      * @return a generated access token
      */
     @PostMapping("/reissue")
-    public ResponseEntity<AccessTokenResponse> reissue(HttpServletRequest request) {
+    public ResponseEntity<TokenResponse> reissue(HttpServletRequest request) {
         String refreshToken = request.getHeader("Refresh-Token");
-        AccessTokenResponse accessTokenResponse = authService.reissueAccessToken(refreshToken);
+        TokenResponse accessTokenResponse = authService.reissueAccessToken(refreshToken);
         log.info("[auth/reissue] success. accessTokenResponse={}", accessTokenResponse);
         return ResponseEntity.ok(accessTokenResponse);
     }

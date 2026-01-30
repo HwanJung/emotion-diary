@@ -99,7 +99,7 @@ public class AuthService {
      * @return a generated access token
      */
     @Transactional
-    public AccessTokenResponse reissueAccessToken(String refreshToken) {
+    public TokenResponse reissueAccessToken(String refreshToken) {
         Claims claims = jwtProvider.parseClaims(refreshToken, TokenType.REFRESH);
         Long uid = jwtProvider.getUserIdFromClaims(claims, TokenType.REFRESH);
 
@@ -112,8 +112,10 @@ public class AuthService {
         }
 
         String accessToken = jwtProvider.generateToken(uid, TokenType.ACCESS);
+        String newRefreshToken = jwtProvider.generateToken(uid, TokenType.REFRESH);
+        refreshTokenRepository.save(uid, newRefreshToken);
 
-        return new AccessTokenResponse("Bearer", accessToken);
+        return new TokenResponse("Bearer", accessToken, refreshToken);
 
     }
 }

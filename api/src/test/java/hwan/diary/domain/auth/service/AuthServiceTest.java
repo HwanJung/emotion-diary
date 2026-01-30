@@ -179,7 +179,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    void reissueAccessToken_whenSavedTokenValid_thenReturnsAccessToken() {
+    void reissueAccessToken_whenSavedTokenValid_thenReturnsToken() {
         // given
         String refreshToken = "refresh_token";
 
@@ -189,13 +189,15 @@ public class AuthServiceTest {
         given(refreshTokenRepository.get(1L)).willReturn("refresh_token");
 
         given(jwtProvider.generateToken(1L, TokenType.ACCESS)).willReturn("access_token");
+        given(jwtProvider.generateToken(1L, TokenType.REFRESH)).willReturn("new_refresh_token");
 
         // when
-        AccessTokenResponse accessTokenResponse = authService.reissueAccessToken(refreshToken);
+        TokenResponse tokenResponse = authService.reissueAccessToken(refreshToken);
 
         // then
-        assertEquals("Bearer", accessTokenResponse.tokenType());
-        assertEquals("access_token", accessTokenResponse.accessToken());
+        assertEquals("Bearer", tokenResponse.tokenType());
+        assertEquals("access_token", tokenResponse.accessToken());
+        assertEquals("new_refresh_token", tokenResponse.refreshToken());
     }
 
     @Test

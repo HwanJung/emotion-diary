@@ -92,13 +92,14 @@ public class AuthControllerTest {
     @Test
     void reissue_whenValidToken_thenReturnToken() throws Exception {
         // given
-        AccessTokenResponse accessTokenResponse = new AccessTokenResponse(
+        TokenResponse tokenResponse = new TokenResponse(
             "Bearer",
-            "access-token"
+            "access-token",
+            "new-refresh-token"
         );
         String refreshToken = "refresh_token";
 
-        given(authService.reissueAccessToken(refreshToken)).willReturn(accessTokenResponse);
+        given(authService.reissueAccessToken(refreshToken)).willReturn(tokenResponse);
 
         // when & then
         mockMvc.perform(post("/api/auth/reissue")
@@ -106,6 +107,8 @@ public class AuthControllerTest {
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.tokenType").value("Bearer"))
-            .andExpect(jsonPath("$.accessToken").value("access-token"));
+            .andExpect(jsonPath("$.accessToken").value("access-token"))
+            .andExpect(jsonPath("$.refreshToken").value("new-refresh-token"));
+
     }
 }
