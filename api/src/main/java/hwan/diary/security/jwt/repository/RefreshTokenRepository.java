@@ -16,7 +16,7 @@ public class RefreshTokenRepository {
 
     public void save(Long userId, String refreshToken) {
         stringRedisTemplate.opsForValue().set(
-            String.valueOf(userId),
+            buildKey(userId),
             refreshToken,
             tokenProperties.getRefreshTokenExpirationMs(),
             TimeUnit.MILLISECONDS
@@ -24,10 +24,14 @@ public class RefreshTokenRepository {
     }
 
     public String get(Long userId) {
-        return stringRedisTemplate.opsForValue().get(String.valueOf(userId));
+        return stringRedisTemplate.opsForValue().get(buildKey(userId));
     }
 
     public void delete(Long userId) {
-        stringRedisTemplate.delete(String.valueOf(userId));
+        stringRedisTemplate.delete(buildKey(userId));
+    }
+
+    private String buildKey(Long userId) {
+        return "refresh:" + userId;
     }
 }
