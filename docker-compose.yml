@@ -18,6 +18,9 @@ services:
     container_name: api
     restart: unless-stopped
     env_file: .env.prod
+    depends_on:
+      - redis
+      - db
     networks:
       - appnet
 
@@ -56,6 +59,9 @@ services:
     volumes:
       - /home/ubuntu/emotion-diary/model-params:/app/model_params
     mem_limit: 900m
+    depends_on:
+      - redis
+      - db
     networks:
       - appnet
 
