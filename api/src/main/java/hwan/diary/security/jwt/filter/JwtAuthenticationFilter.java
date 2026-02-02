@@ -35,6 +35,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final AuthenticationEntryPoint entryPoint;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+
+        // Swagger / OpenAPI
+        if (path.startsWith("/v3/api-docs")) return true;
+        if (path.startsWith("/swagger-ui")) return true;
+        if (path.equals("/swagger-ui.html")) return true;
+
+        // (선택) actuator 열어뒀으면
+        if (path.startsWith("/actuator")) return true;
+
+        return false;
+    }
+
+    @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
