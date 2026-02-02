@@ -29,7 +29,7 @@ public class DiaryController {
     private final DiaryService diaryService;
 
     @GetMapping
-    public SliceResponse<DiaryDto> listDiaries(
+    public SliceResponse<DiaryWithEmotionDto> listDiaries(
         Principal principal,
         @PageableDefault(size = 10) Pageable pageable
     ) {

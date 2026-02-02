@@ -7,6 +7,8 @@ import hwan.diary.domain.diary.dto.command.CreateDiaryCommand;
 import hwan.diary.domain.diary.dto.command.UpdateDiaryCommand;
 import hwan.diary.domain.diary.dto.response.SliceResponse;
 import hwan.diary.domain.diary.entity.Diary;
+import hwan.diary.domain.diary.enums.AnalysisStatus;
+import hwan.diary.domain.diary.enums.Emotion;
 import hwan.diary.domain.diary.repository.DiaryRepository;
 import hwan.diary.domain.user.entity.User;
 import hwan.diary.domain.user.repository.UserRepository;
@@ -121,11 +123,26 @@ public class DiaryServiceTest {
         User user = User.create("testUser", "test@example.com");
         ReflectionTestUtils.setField(user, "id", USER_ID);
 
-        Diary d1 = Diary.create(user, "t1", "c1", "img1", DIARY_DATE);
-        Diary d2 = Diary.create(user, "t2", "c2", "img2", DIARY_DATE2);
-
-        org.springframework.test.util.ReflectionTestUtils.setField(d1, "id", 11L);
-        org.springframework.test.util.ReflectionTestUtils.setField(d2, "id", 12L);
+        DiaryWithEmotionDto d1 = new DiaryWithEmotionDto(
+            11L,
+            "t1",
+            "c1",
+            "img1",
+            DIARY_DATE,
+            AnalysisStatus.DONE,
+            Emotion.JOY,
+            Emotion.JOY.getColorCode()
+        );
+        DiaryWithEmotionDto d2 = new DiaryWithEmotionDto(
+            12L,
+            "t2",
+            "c2",
+            "img2",
+            DIARY_DATE2,
+            AnalysisStatus.DONE,
+            Emotion.ANGER,
+            Emotion.ANGER.getColorCode()
+        );
 
         int requestedPage = 1;
         int requestedSize = 10;
@@ -138,7 +155,7 @@ public class DiaryServiceTest {
         Pageable req = PageRequest.of(requestedPage, requestedSize);
 
         // when
-        SliceResponse<DiaryDto> resp = diaryService.findDiaries(USER_ID, req);
+        SliceResponse<DiaryWithEmotionDto> resp = diaryService.findDiaries(USER_ID, req);
 
         // then
         assertEquals(requestedPage, resp.page());
@@ -146,20 +163,26 @@ public class DiaryServiceTest {
         assertFalse(resp.hasNext());
         assertEquals(2, resp.content().size());
 
-        DiaryDto dto1 = resp.content().get(0);
-        DiaryDto dto2 = resp.content().get(1);
+        DiaryWithEmotionDto dto1 = resp.content().get(0);
+        DiaryWithEmotionDto dto2 = resp.content().get(1);
 
         assertEquals(11L, dto1.id());
         assertEquals("t1", dto1.title());
         assertEquals("c1", dto1.content());
         assertEquals("img1", dto1.imageKey());
         assertEquals(DIARY_DATE, dto1.diaryDate());
+        assertEquals(AnalysisStatus.DONE, dto1.analysisStatus());
+        assertEquals(Emotion.JOY, dto1.emotion());
+        assertEquals(Emotion.JOY.getColorCode(), dto1.emotion().getColorCode());
 
         assertEquals(12L, dto2.id());
         assertEquals("t2", dto2.title());
         assertEquals("c2", dto2.content());
         assertEquals("img2", dto2.imageKey());
         assertEquals(DIARY_DATE2, dto2.diaryDate());
+        assertEquals(AnalysisStatus.DONE, dto2.analysisStatus());
+        assertEquals(Emotion.ANGER, dto2.emotion());
+        assertEquals(Emotion.ANGER.getColorCode(), dto2.emotion().getColorCode());
 
         verify(diaryRepository, times(1)).findSliceByUserId(eq(USER_ID), any(Pageable.class));
         verifyNoMoreInteractions(diaryRepository);

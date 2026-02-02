@@ -15,11 +15,21 @@ import java.util.Optional;
 public interface DiaryRepository extends JpaRepository<Diary, Long> {
 
     @Query("""
-        select d from Diary d
-        where d.user.id = :userId and d.deleted=false
-        order by d.diaryDate desc, d.id desc
+        select new hwan.diary.domain.diary.dto.DiaryWithEmotionDto(
+            d.id,
+            d.title,
+            d.content,
+            d.imageKey,
+            d.diaryDate,
+            e.status,
+            e.emotion,
+            e.colorCode
+        )
+        from Diary d join EmotionAnalysis e on e.diary.id = d.id
+        where d.user.id = :userId
+            and d.deleted = false
     """)
-    Slice<Diary> findSliceByUserId(@Param("userId") Long userId, Pageable pageable);
+    Slice<DiaryWithEmotionDto> findSliceByUserId(@Param("userId") Long userId, Pageable pageable);
 
     Optional<Diary> findByIdAndUserIdAndDeletedFalse(Long id, Long userId);
 

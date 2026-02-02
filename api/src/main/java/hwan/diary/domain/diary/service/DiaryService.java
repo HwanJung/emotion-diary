@@ -111,12 +111,11 @@ public class DiaryService {
      * @return SliceResponse containing content, page, size, hasNext.
      */
     @Transactional(readOnly = true)
-    public SliceResponse<DiaryDto> findDiaries(Long userId, Pageable pageable) {
+    public SliceResponse<DiaryWithEmotionDto> findDiaries(Long userId, Pageable pageable) {
         int size = Math.min(Math.max(pageable.getPageSize(), 1), 100);
         Pageable p = PageRequest.of(pageable.getPageNumber(), size);
 
-        Slice<DiaryDto> slice = diaryRepository.findSliceByUserId(userId, p)
-            .map(DiaryMapper::toDiaryDto);
+        Slice<DiaryWithEmotionDto> slice = diaryRepository.findSliceByUserId(userId, p);
 
         return SliceResponse.of(slice);
     }

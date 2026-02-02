@@ -1,8 +1,11 @@
 package hwan.diary.domain.diary.controller;
 
 import hwan.diary.domain.diary.dto.DiaryDto;
+import hwan.diary.domain.diary.dto.DiaryWithEmotionDto;
 import hwan.diary.domain.diary.dto.response.SliceResponse;
 import hwan.diary.domain.diary.entity.Diary;
+import hwan.diary.domain.diary.enums.AnalysisStatus;
+import hwan.diary.domain.diary.enums.Emotion;
 import hwan.diary.domain.diary.service.DiaryService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -26,15 +29,33 @@ class DiaryControllerListUnitTest {
         Principal principal = () -> "42";
         Pageable pageable = PageRequest.of(1, 5, Sort.by(Sort.Order.desc("diaryDate")));
 
-        var d1 = new DiaryDto(1L, "t1", "c1", "img1", LocalDate.parse("2025-09-01"));
-        var d2 = new DiaryDto(2L, "t2", "c2", "img2", LocalDate.parse("2025-09-02"));
+        DiaryWithEmotionDto d1 = new DiaryWithEmotionDto(
+            1L,
+            "t1",
+            "c1",
+            "img1",
+            LocalDate.parse("2025-09-01"),
+            AnalysisStatus.DONE,
+            Emotion.JOY,
+            Emotion.JOY.getColorCode()
+            );
+        DiaryWithEmotionDto d2 = new DiaryWithEmotionDto(
+            2L,
+            "t2",
+            "c2",
+            "img2",
+            LocalDate.parse("2025-09-02"),
+            AnalysisStatus.DONE,
+            Emotion.ANGER,
+            Emotion.ANGER.getColorCode()
+        );
 
-        SliceResponse<DiaryDto> expected = new SliceResponse(List.of(d1, d2), 1, 5, false);
+        SliceResponse<DiaryWithEmotionDto> expected = new SliceResponse<>(List.of(d1, d2), 1, 5, false);
 
         when(diaryService.findDiaries(42L, pageable)).thenReturn(expected);
 
         // when
-        SliceResponse<DiaryDto> actual = controller.listDiaries(principal, pageable);
+        SliceResponse<DiaryWithEmotionDto> actual = controller.listDiaries(principal, pageable);
 
         // then
         assertThat(actual).isSameAs(expected);
