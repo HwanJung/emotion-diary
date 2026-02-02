@@ -3,7 +3,7 @@ package hwan.diary.security.jwt.principal;
 import java.security.Principal;
 
 /**
- * Represent Authenticated user info(id)
+ * Represent Authenticated user info(diaryId)
  * Spring Security use this principal to identify the authenticated user
  *
  */

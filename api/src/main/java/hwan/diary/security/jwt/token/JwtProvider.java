@@ -33,9 +33,9 @@ public class JwtProvider {
     }
 
     /**
-     * Generate a JWT token containing the user id as the subject.
+     * Generate a JWT token containing the user diaryId as the subject.
      *
-     * @param userId the user id to include in the token
+     * @param userId the user diaryId to include in the token
      * @param type   the type of token (ACCESS or REFRESH)
      * @return generated JWT token as String
      */
@@ -84,12 +84,12 @@ public class JwtProvider {
     }
 
     /**
-     * Extract user id from the claims.
+     * Extract user diaryId from the claims.
      * Throws an exception, when subject is not Long type.
      *
      * @param claims extracted from a valid token.
      * @param type   the token type(ACCESS or REFRESH)
-     * @return user id as Long
+     * @return user diaryId as Long
      */
     public Long getUserIdFromClaims(Claims claims, TokenType type) {
         try {

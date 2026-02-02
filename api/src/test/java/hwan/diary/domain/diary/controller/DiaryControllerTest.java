@@ -63,6 +63,7 @@ public class DiaryControllerTest {
     private static final String CONTENT = "contentEx";
     private static final String IMAGE_KEY = "imageKeyEx";
     private static final LocalDate DIARY_DATE = LocalDate.of(2025, 9, 1);
+    private static final Long ANALYSIS_ID = 11L;
     private static final AnalysisStatus ANALYSIS_STATUS = AnalysisStatus.DONE;
     private static final Emotion EMOTION = Emotion.JOY;
 
@@ -71,7 +72,7 @@ public class DiaryControllerTest {
     @Test
     void getDiary_returns200_andBody() throws Exception {
         // given
-        DiaryWithEmotionDto diaryWithEmotionDto = new DiaryWithEmotionDto(DIARY_ID, TITLE, CONTENT, IMAGE_KEY, DIARY_DATE, ANALYSIS_STATUS, EMOTION, EMOTION.getColorCode());
+        DiaryWithEmotionDto diaryWithEmotionDto = new DiaryWithEmotionDto(DIARY_ID, TITLE, CONTENT, IMAGE_KEY, DIARY_DATE, ANALYSIS_ID, ANALYSIS_STATUS, EMOTION, EMOTION.getColorCode());
 
         given(diaryService.findDiaryWithEmotion(DIARY_ID, USER_ID)).willReturn(diaryWithEmotionDto);
 
@@ -92,7 +93,7 @@ public class DiaryControllerTest {
     void createDiary_return201_andBody() throws Exception {
         // given
         CreateDiaryRequest request = new CreateDiaryRequest(TITLE, CONTENT, IMAGE_KEY, DIARY_DATE);
-        DiaryWithEmotionDto diaryWithEmotionDto = new DiaryWithEmotionDto(DIARY_ID, TITLE, CONTENT, IMAGE_KEY, DIARY_DATE, ANALYSIS_STATUS, EMOTION, EMOTION.getColorCode());
+        DiaryWithEmotionDto diaryWithEmotionDto = new DiaryWithEmotionDto(DIARY_ID, TITLE, CONTENT, IMAGE_KEY, DIARY_DATE, ANALYSIS_ID, ANALYSIS_STATUS, EMOTION, EMOTION.getColorCode());
 
         given(diaryService.createDiary(any(CreateDiaryCommand.class), eq(USER_ID)))
             .willReturn(diaryWithEmotionDto);
@@ -123,7 +124,7 @@ public class DiaryControllerTest {
     void updateDiary_return200_andBody() throws Exception {
         // given
         UpdateDiaryRequest request = new UpdateDiaryRequest(TITLE, CONTENT, IMAGE_KEY, DIARY_DATE, true);
-        DiaryWithEmotionDto diaryWithEmotionDto = new DiaryWithEmotionDto(DIARY_ID, TITLE, CONTENT, IMAGE_KEY, DIARY_DATE, ANALYSIS_STATUS, EMOTION, EMOTION.getColorCode());
+        DiaryWithEmotionDto diaryWithEmotionDto = new DiaryWithEmotionDto(DIARY_ID, TITLE, CONTENT, IMAGE_KEY, DIARY_DATE, ANALYSIS_ID, ANALYSIS_STATUS, EMOTION, EMOTION.getColorCode());
 
         given(diaryService.updateDiary(eq(USER_ID), eq(DIARY_ID), any(UpdateDiaryCommand.class)))
             .willReturn(diaryWithEmotionDto);

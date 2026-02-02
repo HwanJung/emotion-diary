@@ -1,7 +1,6 @@
 package hwan.diary.domain.diary.service;
 
 import hwan.diary.common.exception.diary.DiaryNotFoundException;
-import hwan.diary.domain.diary.dto.DiaryDto;
 import hwan.diary.domain.diary.dto.DiaryWithEmotionDto;
 import hwan.diary.domain.diary.dto.command.CreateDiaryCommand;
 import hwan.diary.domain.diary.dto.command.UpdateDiaryCommand;
@@ -129,6 +128,7 @@ public class DiaryServiceTest {
             "c1",
             "img1",
             DIARY_DATE,
+            22L,
             AnalysisStatus.DONE,
             Emotion.JOY,
             Emotion.JOY.getColorCode()
@@ -139,6 +139,7 @@ public class DiaryServiceTest {
             "c2",
             "img2",
             DIARY_DATE2,
+            33L,
             AnalysisStatus.DONE,
             Emotion.ANGER,
             Emotion.ANGER.getColorCode()
@@ -166,7 +167,7 @@ public class DiaryServiceTest {
         DiaryWithEmotionDto dto1 = resp.content().get(0);
         DiaryWithEmotionDto dto2 = resp.content().get(1);
 
-        assertEquals(11L, dto1.id());
+        assertEquals(11L, dto1.diaryId());
         assertEquals("t1", dto1.title());
         assertEquals("c1", dto1.content());
         assertEquals("img1", dto1.imageKey());
@@ -175,7 +176,7 @@ public class DiaryServiceTest {
         assertEquals(Emotion.JOY, dto1.emotion());
         assertEquals(Emotion.JOY.getColorCode(), dto1.emotion().getColorCode());
 
-        assertEquals(12L, dto2.id());
+        assertEquals(12L, dto2.diaryId());
         assertEquals("t2", dto2.title());
         assertEquals("c2", dto2.content());
         assertEquals("img2", dto2.imageKey());
@@ -200,7 +201,7 @@ public class DiaryServiceTest {
         DiaryWithEmotionDto dto = diaryService.updateDiary(USER_ID, DIARY_ID, cmd);
 
         // then
-        assertEquals(DIARY_ID, dto.id());
+        assertEquals(DIARY_ID, dto.diaryId());
         assertEquals("new title", dto.title());
         assertEquals("new content", dto.content());
         assertEquals(newDate, dto.diaryDate());

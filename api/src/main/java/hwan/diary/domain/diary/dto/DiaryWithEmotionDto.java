@@ -6,11 +6,12 @@ import hwan.diary.domain.diary.enums.Emotion;
 import java.time.LocalDate;
 
 public record DiaryWithEmotionDto(
-    Long id,
+    Long diaryId,
     String title,
     String content,
     String imageKey,
     LocalDate diaryDate,
+    Long analysisId,
     AnalysisStatus analysisStatus,
     Emotion emotion,
     String colorCode

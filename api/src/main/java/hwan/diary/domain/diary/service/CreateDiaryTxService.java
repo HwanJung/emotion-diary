@@ -21,6 +21,7 @@ public class CreateDiaryTxService {
     private final UserRepository userRepository;
     private final EmotionAnalysisRepository emotionAnalysisRepository;
 
+
     @Transactional
     public Diary createDiaryTx(CreateDiaryCommand createDiaryCommand, Long userId) {
         User userRef = userRepository.getReferenceById(userId);

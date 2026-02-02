@@ -30,7 +30,7 @@ public class UserService {
     /**
      * find a user by ID
      *
-     * @param id the id of user to find
+     * @param id the diaryId of user to find
      * @return the found user as UserResponse
      */
     public UserResponse findUserById(Long id) {
@@ -46,7 +46,7 @@ public class UserService {
     /**
      * Update user information(username, profile image)
      *
-     * @param id      the id of the user to update
+     * @param id      the diaryId of the user to update
      * @param request the request containing username and profileImageKey to set
      * @return the updated user as UserResponse
      */

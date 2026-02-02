@@ -13,6 +13,7 @@ import hwan.diary.domain.diary.dto.command.UpdateDiaryCommand;
 import hwan.diary.domain.diary.dto.response.SliceResponse;
 import hwan.diary.domain.diary.entity.Diary;
 import hwan.diary.domain.diary.enums.Emotion;
+import hwan.diary.domain.diary.publisher.AnalysisEventPublisher;
 import hwan.diary.domain.diary.repository.DiaryRepository;
 import hwan.diary.domain.diary.util.DiaryMapper;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +34,9 @@ public class DiaryService {
 
     private final DiaryRepository diaryRepository;
     private final S3Service s3Service;
-    private final EmotionAnalysisClient emotionAnalysisClient;
+//    private final EmotionAnalysisClient emotionAnalysisClient;
     private final CreateDiaryTxService createDiaryTxService;
+    private final AnalysisEventPublisher analysisEventPublisher;
 
     /**
      * Create a new {@link Diary} for the given user and save to DB.
@@ -42,58 +44,82 @@ public class DiaryService {
      * Then, save the result receiving from the server.
      *
      * @param createDiaryCommand command containing title, content, optional imageKey, and date
-     * @param userId the id of owner
+     * @param userId the diaryId of owner
      * @return a {@link DiaryWithEmotionDto} containing a diary info
      */
+//    public DiaryWithEmotionDto createDiary(CreateDiaryCommand createDiaryCommand, Long userId) {
+//        Diary savedDiary = createDiaryTxService.createDiaryTx(createDiaryCommand, userId);
+//
+//        try {
+//            log.info("Request to analysis server diaryId={}", savedDiary.getId());
+//            AnalysisResponse response = callAnalysisApi(savedDiary);
+//            Emotion emotion = normalizeEmotion(response.emotion());
+//            createDiaryTxService.markDoneTx(savedDiary.getId(), emotion, response.colorCode());
+//        } catch (ResourceAccessException e) {
+//            log.error("[ANALYSIS_SERVER][NETWORK] connection failed/timeout diaryId={} msg={}",
+//                savedDiary.getId(), e.getMessage(), e);
+//
+//            createDiaryTxService.markFailedTx(savedDiary.getId());
+//        } catch (RestClientResponseException e) {
+//            log.error("[ANALYSIS_SERVER][HTTP_ERROR] diaryId={} status={} body={}",
+//                savedDiary.getId(), e.getRawStatusCode(), e.getResponseBodyAsString(), e);
+//
+//            createDiaryTxService.markFailedTx(savedDiary.getId());
+//        }
+//
+//        return diaryRepository.findDiaryWithEmotionById(userId, savedDiary.getId())
+//            .orElseThrow(() -> new DiaryNotFoundException(ErrorCode.DIARY_NOT_FOUND, savedDiary.getId(), userId));
+//    }
+
     public DiaryWithEmotionDto createDiary(CreateDiaryCommand createDiaryCommand, Long userId) {
         Diary savedDiary = createDiaryTxService.createDiaryTx(createDiaryCommand, userId);
 
-        try {
-            log.info("Request to analysis server diaryId={}", savedDiary.getId());
-            AnalysisResponse response = callAnalysisApi(savedDiary);
-            Emotion emotion = normalizeEmotion(response.emotion());
-            createDiaryTxService.markDoneTx(savedDiary.getId(), emotion, response.colorCode());
-        } catch (ResourceAccessException e) {
-            log.error("[ANALYSIS_SERVER][NETWORK] connection failed/timeout diaryId={} msg={}",
-                savedDiary.getId(), e.getMessage(), e);
-
-            createDiaryTxService.markFailedTx(savedDiary.getId());
-        } catch (RestClientResponseException e) {
-            log.error("[ANALYSIS_SERVER][HTTP_ERROR] diaryId={} status={} body={}",
-                savedDiary.getId(), e.getRawStatusCode(), e.getResponseBodyAsString(), e);
-
-            createDiaryTxService.markFailedTx(savedDiary.getId());
-        }
-
-        return diaryRepository.findDiaryWithEmotionById(userId, savedDiary.getId())
+        DiaryWithEmotionDto diaryWithEmotionDto = diaryRepository.findDiaryWithEmotionById(userId, savedDiary.getId())
             .orElseThrow(() -> new DiaryNotFoundException(ErrorCode.DIARY_NOT_FOUND, savedDiary.getId(), userId));
+
+        analysisEventPublisher.publish(
+            diaryWithEmotionDto.diaryId(),
+            diaryWithEmotionDto.analysisId(),
+            getImageUrl(savedDiary.getImageKey())
+            );
+
+        return diaryWithEmotionDto;
     }
 
-    private AnalysisResponse callAnalysisApi(Diary savedDiary) {
+    private String getImageUrl(String imageKey) {
         String presignedUrl = null;
-        if (savedDiary.getImageKey() != null) {
-            presignedUrl = s3Service.createGetPresignedUrl(savedDiary.getImageKey());
+        if (imageKey != null) {
+            presignedUrl = s3Service.createGetPresignedUrl(imageKey);
         }
-
-        return emotionAnalysisClient.postAnalysisRequest(
-            new AnalysisRequest(savedDiary.getContent(), presignedUrl)
-        );
+        return presignedUrl;
     }
 
-    private Emotion normalizeEmotion(String raw) {
-        if (raw == null) return Emotion.UNKNOWN;
-        try {
-            return Emotion.valueOf(raw.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return Emotion.UNKNOWN;
-        }
-    }
+//
+//    private AnalysisResponse callAnalysisApi(Diary savedDiary) {
+//        String presignedUrl = null;
+//        if (savedDiary.getImageKey() != null) {
+//            presignedUrl = s3Service.createGetPresignedUrl(savedDiary.getImageKey());
+//        }
+//
+//        return emotionAnalysisClient.postAnalysisRequest(
+//            new AnalysisRequest(savedDiary.getContent(), presignedUrl)
+//        );
+//    }
+//
+//    private Emotion normalizeEmotion(String raw) {
+//        if (raw == null) return Emotion.UNKNOWN;
+//        try {
+//            return Emotion.valueOf(raw.trim().toUpperCase());
+//        } catch (IllegalArgumentException e) {
+//            return Emotion.UNKNOWN;
+//        }
+//    }
 
     /**
-     * Find a diary corresponding the diary id and the userId in DB.
+     * Find a diary corresponding the diary diaryId and the userId in DB.
      *
-     * @param id the diary id
-     * @param userId the id of an owner.
+     * @param id the diary diaryId
+     * @param userId the diaryId of an owner.
      * @return Diary DTO containing a diary info {@link DiaryDto}
      */
     @Transactional(readOnly = true)
@@ -106,7 +132,7 @@ public class DiaryService {
      * Find slice of diaries by userId.
      * A page size is the requested size. A default size is 10.
      *
-     * @param userId the id of owner
+     * @param userId the diaryId of owner
      * @param pageable paging info
      * @return SliceResponse containing content, page, size, hasNext.
      */
@@ -123,8 +149,8 @@ public class DiaryService {
     /**
      * Update an existing diary
      *
-     * @param cmd containing the info of the diary and the id of the diary
-     * @param userId the id of the owner.
+     * @param cmd containing the info of the diary and the diaryId of the diary
+     * @param userId the diaryId of the owner.
      * @return {@link DiaryDto} containing a diary info
      */
     @Transactional
@@ -145,10 +171,10 @@ public class DiaryService {
     }
 
     /**
-     * Soft delete the diary by id.
+     * Soft delete the diary by diaryId.
      * Soft deleting is conducted by a SoftDelete annotation of a Diary entity.
      *
-     * @param id diary's id
+     * @param id diary's diaryId
      */
     @Transactional
     public void deleteDiary(Long userId, Long id) {
@@ -160,12 +186,12 @@ public class DiaryService {
 
     /**
      * Internal method of the DiaryService.
-     * Find a diary corresponding the id and userId.
+     * Find a diary corresponding the diaryId and userId.
      * If there is not a diary corresponding the parameters, throw a custom exception.
      *
      *
-     * @param id the id of a diary
-     * @param userId the id of an owner
+     * @param id the diaryId of a diary
+     * @param userId the diaryId of an owner
      * @return {@link Diary}
      * @throws {@link DiaryNotFoundException} if not found or not owned by userId
      */

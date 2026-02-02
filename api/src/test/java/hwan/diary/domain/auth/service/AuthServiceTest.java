@@ -157,7 +157,7 @@ public class AuthServiceTest {
      */
     private static void setId(Object entity, Long id) {
         try {
-            var f = entity.getClass().getDeclaredField("id");
+            var f = entity.getClass().getDeclaredField("diaryId");
             f.setAccessible(true);
             f.set(entity, id);
         } catch (Exception e) {

@@ -35,6 +35,7 @@ class DiaryControllerListUnitTest {
             "c1",
             "img1",
             LocalDate.parse("2025-09-01"),
+            11L,
             AnalysisStatus.DONE,
             Emotion.JOY,
             Emotion.JOY.getColorCode()
@@ -45,6 +46,7 @@ class DiaryControllerListUnitTest {
             "c2",
             "img2",
             LocalDate.parse("2025-09-02"),
+            22L,
             AnalysisStatus.DONE,
             Emotion.ANGER,
             Emotion.ANGER.getColorCode()

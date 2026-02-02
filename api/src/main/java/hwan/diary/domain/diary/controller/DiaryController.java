@@ -1,6 +1,5 @@
 package hwan.diary.domain.diary.controller;
 
-import hwan.diary.domain.diary.dto.DiaryDto;
 import hwan.diary.domain.diary.dto.DiaryWithEmotionDto;
 import hwan.diary.domain.diary.dto.command.CreateDiaryCommand;
 import hwan.diary.domain.diary.dto.command.UpdateDiaryCommand;
@@ -60,8 +59,8 @@ public class DiaryController {
         DiaryWithEmotionDto created = diaryService.createDiary(cmd, userId);
         URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
-            .path("/{id}")
-            .buildAndExpand(created.id())
+            .path("/{diaryId}")
+            .buildAndExpand(created.diaryId())
             .toUri();
 
         return ResponseEntity.created(location).body(created);

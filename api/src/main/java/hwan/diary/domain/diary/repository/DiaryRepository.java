@@ -21,6 +21,7 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
             d.content,
             d.imageKey,
             d.diaryDate,
+            e.id,
             e.status,
             e.emotion,
             e.colorCode
@@ -40,6 +41,7 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
             d.content,
             d.imageKey,
             d.diaryDate,
+            e.id,
             e.status,
             e.emotion,
             e.colorCode

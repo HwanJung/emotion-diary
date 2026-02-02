@@ -32,7 +32,7 @@ public class AuthService {
 
     /**
      * Handles user login request.
-     * Generate an access token and a refresh token using user id.
+     * Generate an access token and a refresh token using user diaryId.
      * Save a refresh token in redis.
      *
      * @param request OAuth login request containing provider info and user details
@@ -82,9 +82,9 @@ public class AuthService {
     }
 
     /**
-     * Logout logic. Delete a refresh token using user id.
+     * Logout logic. Delete a refresh token using user diaryId.
      *
-     * @param uid id of user to logout
+     * @param uid diaryId of user to logout
      */
     @Transactional
     public void logout(Long uid) {
