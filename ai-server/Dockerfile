@@ -17,7 +17,7 @@ RUN python -m pip install --no-cache-dir --upgrade pip \
     --extra-index-url https://download.pytorch.org/whl/cpu \
  && python -m pip install --no-cache-dir -r requirements.txt
 
-# 5. 프로젝트의 모든 파일(main.py, model/ 폴더 등)을 컨테이너 안으로 복사
+# 5. 프로젝트의 모든 파일(app/ 폴더 등)을 컨테이너 안으로 복사
 COPY . .
 
 # 6. 서버가 사용할 포트를 외부에 알림
@@ -25,4 +25,4 @@ EXPOSE 8000
 
 # 7. 컨테이너가 시작될 때 실행할 최종 명령어
 # (0.0.0.0은 컨테이너 외부에서 접속을 허용하기 위해 필수)
-CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -5,3 +5,6 @@ transformers
 timm
 requests
 Pillow
+pydantic-settings>=2.0.0
+aio-pika>=9.0.0
+asyncpg>=0.29.0
