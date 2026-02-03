@@ -7,3 +7,5 @@ venv/
 model_params/fusion_head_model_0.pt
 model_params/image_best_model.pth
 model_params/text_best_model.pt
+model_classes/
+REFACTORING_LOG.md
