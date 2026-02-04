@@ -1,21 +1,23 @@
 from pydantic_settings import BaseSettings
 from functools import lru_cache
+from pydantic import Field
 
 
 class Settings(BaseSettings):
     # PostgreSQL
-    postgres_host: str = "localhost"
-    postgres_port: int = 5432
-    postgres_db: str = "emotion_diary"
-    postgres_user: str = "postgres"
-    postgres_password: str = "postgres"
+    postgres_host: str = Field(default="localhost", validation_alias="DB_HOST")
+    postgres_port: int = Field(default=5432, validation_alias="DB_PORT")
+    postgres_db: str = Field(default="emotion_diary", validation_alias="DB_NAME")
+    postgres_user: str = Field(default="postgres", validation_alias="DB_USERNAME")
+    postgres_password: str = Field(default="postgres", validation_alias="DB_PASSWORD")
 
     # RabbitMQ
-    rabbitmq_host: str = "localhost"
-    rabbitmq_port: int = 5672
-    rabbitmq_username: str = "guest"
-    rabbitmq_password: str = "guest"
-    rabbitmq_queue: str = "diary.analysis.queue"
+    rabbitmq_host: str = Field(default="localhost", validation_alias="RABBITMQ_HOST")
+    rabbitmq_port: int = Field(default=5672, validation_alias="RABBITMQ_PORT")
+    rabbitmq_username: str = Field(default="guest", validation_alias="RABBITMQ_USERNAME")
+    rabbitmq_password: str = Field(default="guest", validation_alias="RABBITMQ_PASSWORD")
+    rabbitmq_queue: str = Field(default="diary.analysis.queue", validation_alias="RABBITMQ_QUEUE")
+
 
     # Model paths
     text_model_path: str = "model_params/text_best_model.pt"
